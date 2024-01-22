@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const { User, Project } = require('../models')
+const { User, Employee, Project } = require('../models')
 const { tokenExtractor } = require('../util/middleware')
 
 router.get('/', tokenExtractor, async (request, response) => {
@@ -8,10 +8,20 @@ router.get('/', tokenExtractor, async (request, response) => {
         where: {
             id: request.decodedToken.id
         },
-        include: Project
+        include: [
+            {
+                model: Employee,
+                include: [
+                    Project
+                ]
+            }
+        ]
     })
 
-    response.json(user.projects)
+    //TODO: Because both an employee and a client can have projects,
+    // make sure that the endpoint return project data regardless of
+    // user position.
+    response.json(user.employee.projects)
 })
 
 module.exports = router

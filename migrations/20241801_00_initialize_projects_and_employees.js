@@ -30,7 +30,7 @@ module.exports = {
                 autoIncrement: true
             }
         })
-        await queryInterface.createTable('employees_projects', {
+        await queryInterface.createTable('employee_projects', {
             id: {
                 type: DataTypes.INTEGER,
                 primaryKey: true,
@@ -58,6 +58,6 @@ module.exports = {
     down: async ({ context: queryInterface }) => {
         await queryInterface.dropTable('projects')
         await queryInterface.dropTable('employees')
-        await queryInterface.dropTable('employees_projects')
+        await queryInterface.dropTable('employee_projects')
     }
 }
