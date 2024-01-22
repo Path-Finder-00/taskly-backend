@@ -11,6 +11,9 @@ Employee_Project.init({
     },
     to: {
         type: DataTypes.DATE
+    },
+    manager: {
+        type: DataTypes.BOOLEAN
     }
 }, {
     sequelize,
