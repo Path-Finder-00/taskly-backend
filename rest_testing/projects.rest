@@ -1,0 +1,6 @@
+GET http://localhost:3001/api/projects HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RfYWRtaW5AZ21haWwuY29tIiwiaWQiOjEsImlhdCI6MTcwNTk2MzQ3NH0.LpQZTv5iMen8_WFoxdYWKdSrxEZtYhfrs-5tlgmiWaM
+
+ {
+ }

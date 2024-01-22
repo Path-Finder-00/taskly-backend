@@ -5,6 +5,11 @@ const { sequelize } = require('../util/db')
 class Employee_Project extends Model {}
 
 Employee_Project.init({
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
     since: {
         type: DataTypes.DATE,
         allowNull: false
@@ -14,6 +19,16 @@ Employee_Project.init({
     },
     manager: {
         type: DataTypes.BOOLEAN
+    },
+    employeeId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: { model: 'employees', key: 'id' }
+    },
+    projectId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: { model: 'projects', key: 'id' }
     }
 }, {
     sequelize,

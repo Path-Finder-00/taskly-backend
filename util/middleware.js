@@ -1,6 +1,11 @@
 const { SECRET } = require('../util/config')
 const jwt = require('jsonwebtoken')
 const { Session } = require('../models')
+const logger = require('./logger')
+
+const errorHandler = (error, request, response, next) => {
+    logger.error(error)
+}
 
 const tokenExtractor = async (req, res, next) => {
     try {
@@ -29,5 +34,6 @@ const tokenExtractor = async (req, res, next) => {
 }
 
 module.exports = {
+    errorHandler,
     tokenExtractor
 }
