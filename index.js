@@ -1,4 +1,5 @@
 const express = require('express')
+const cors = require('cors')
 require('express-async-errors')
 const app = express()
 
@@ -12,6 +13,7 @@ const loginRouter = require('./controllers/login')
 const usersRouter = require('./controllers/users')
 
 app.use(express.json())
+app.use(cors())
 
 app.use('/api/projects', projectsRouter)
 app.use('/api/login', loginRouter)
