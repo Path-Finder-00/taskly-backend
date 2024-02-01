@@ -32,10 +32,18 @@ User.init({
         type: DataTypes.TEXT,
         allowNull: false
     },
-    // TODO - write a validator for checking wheter it is a proper phone number
     phone: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        // TODO: shall we consider country codes? e.g. 123456789, +1123456789, +12123456789, +123123456789, +1234123456789 are valid; 1234567890 is not valid
+        validate: {
+            isPhoneNumber(phoneNumber) {
+                const phoneNumberPattern = /^(?:\+\d{1,4}[0-9]{0,9}|\d{9})$/;
+                if (!phoneNumberPattern.test(phoneNumber)) {
+                    throw new Error("Not a phone number.")
+                }
+            }
+        }
     },
     disabled: {
         type: DataTypes.BOOLEAN,
