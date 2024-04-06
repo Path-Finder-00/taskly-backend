@@ -11,6 +11,7 @@ const { connectToDatabase } = require('./util/db')
 const projectsRouter = require('./controllers/projects')
 const loginRouter = require('./controllers/login')
 const usersRouter = require('./controllers/users')
+const rolesRouter = require('./controllers/roles')
 
 app.use(express.json())
 app.use(cors())
@@ -18,6 +19,7 @@ app.use(cors())
 app.use('/api/projects', projectsRouter)
 app.use('/api/login', loginRouter)
 app.use('/api/users', usersRouter)
+app.use('/api/roles', rolesRouter)
 
 app.use(middleware.errorHandler)
 

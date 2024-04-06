@@ -3,8 +3,8 @@ const { DataTypes } = require('sequelize')
 module.exports = {
     up: async ({ context: queryInterface }) => {
         await queryInterface.addColumn('employee_projects', 'manager', {
-          type: DataTypes.BOOLEAN,
-          defaultValue: false
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
         })
     },
     down: async ({ context: queryInterface }) => {

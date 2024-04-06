@@ -12,8 +12,8 @@ Employee_Project.belongsTo(Project)
 Employee.hasMany(Employee_Project)
 Project.hasMany(Employee_Project)
 
-Employee_Project.hasOne(Role)
-Role.belongsTo(Employee_Project)
+Employee_Project.belongsTo(Role)
+Role.hasMany(Employee_Project)
 
 User.hasOne(Session)
 Session.belongsTo(User)
