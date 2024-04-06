@@ -4,3 +4,24 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RfY
 
  {
  }
+
+###
+
+POST http://localhost:3001/api/projects HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RfYWRtaW5AZ21haWwuY29tIiwiaWQiOjEsImlhdCI6MTcwNjEzNTAyNX0.Xpt8jcUZJPBboM9QbiExjkinlgJz3Gu7sTlp0CmZMh4
+
+{
+    "name": "Testowy Projekt 2",
+    "description": "To jest kolejny testowy projekt",
+    "employees": [
+        {
+            "id": 1,
+            "user_id": 1
+        },
+        {
+            "id": 2,
+            "user_id": 2
+        }
+    ]
+}

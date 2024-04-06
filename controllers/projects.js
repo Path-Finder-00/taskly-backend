@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const { User, Employee, Project } = require('../models')
+const { User, Employee, Project, Employee_Project } = require('../models')
 const { tokenExtractor } = require('../util/middleware')
 
 router.get('/', tokenExtractor, async (request, response) => {
@@ -22,6 +22,22 @@ router.get('/', tokenExtractor, async (request, response) => {
     // make sure that the endpoint return project data regardless of
     // user position.
     response.json(user.employee.projects)
+})
+
+router.post('/', tokenExtractor, async (request, response) => {
+
+    try {
+        const user = await User.findByPk(request.decodedToken.id)
+        const project = await Project.create({ name: request.body.name, description: request.body.description })
+        const project_manager = await Employee_Project.create({ since: new Date(), manager: true, employeeId: request.decodedToken.id, projectId: project.id })
+
+        request.body.employees.forEach(async employee => {
+            await Employee_Project.create({ since: new Date(), manager: false, employeeId: employee.id, projectId: project.id })
+        });
+    } catch (error) {
+        console.log(error)
+        return response.status(400).json({ error })
+    }
 })
 
 module.exports = router

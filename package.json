@@ -27,5 +27,11 @@
   "devDependencies": {
     "express-async-errors": "^3.1.1",
     "nodemon": "^3.0.2"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": false,
+    "singleQuote": true
   }
 }
