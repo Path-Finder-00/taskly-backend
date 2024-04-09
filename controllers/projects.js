@@ -23,6 +23,7 @@ router.get('/', tokenExtractor, async (request, response) => {
     // user position.
     response.json(user.employee.projects)
 })
+
 router.get('/:id', async (request, response, next) => {
     try {
         const project = await Project.findOne({
