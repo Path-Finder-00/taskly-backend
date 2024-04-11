@@ -26,7 +26,7 @@ Employee.belongsTo(User)
 Team.belongsToMany(Employee, { through: Employment_History })
 Employee.belongsToMany(Team, { through: Employment_History })
 Employment_History.belongsTo(Team)
-Employment_History.belongsTo(Project)
+Employment_History.belongsTo(Employee)
 Team.hasMany(Employment_History)
 Employee.hasMany(Employment_History)
 

@@ -1,18 +1,16 @@
 const router = require('express').Router()
-
 const { sequelize } = require('../util/db')
 const { Op } = require('sequelize')
 
 const { Team, Employee, User, Employment_History } = require('../models')
 const { tokenExtractor } = require('../util/middleware')
 
-router.get('/members', tokenExtractor,  async (request, response, next) => {
+router.get('/members', tokenExtractor, async (request, response, next) => {
     try {
         User.findAll({
             include: [
                 {
                     model: Employee,
-                    attributes: [],
                     required: true,
                     include: [
                         {
@@ -47,7 +45,7 @@ router.get('/members', tokenExtractor,  async (request, response, next) => {
         }).then(employees => {
             response.json(employees)
         })
-    } catch(error) {
+    } catch (error) {
         next(error)
     }
 })

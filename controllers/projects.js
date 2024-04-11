@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const { User, Employee, Project, Employee_Project } = require('../models')
+const { User, Employee, Project, Employee_Project, Role } = require('../models')
 const { tokenExtractor } = require('../util/middleware')
 
 router.get('/', tokenExtractor, async (request, response) => {
@@ -24,20 +24,23 @@ router.get('/', tokenExtractor, async (request, response) => {
     response.json(user.employee.projects)
 })
 
-router.get('/:id', async (request, response, next) => {
-    try {
-        const project = await Project.findOne({
-            where: { id: request.params.id },
-        });
-
-        if (project) {
-            response.json(project);
-        } else {
-            response.status(404).end();
+router.get('/:id', async (request, response) => {
+    const project = await Project.findOne({
+        where: { id: request.params.id },
+        include: {
+            model: Employee,
+            include: [
+                User
+            ]
         }
-    } catch (error) {
-        next(error);
+    });
+
+    if (project) {
+        response.json(project);
+    } else {
+        response.status(404).end();
     }
+
 });
 
 router.post('/', tokenExtractor, async (request, response) => {
@@ -48,8 +51,17 @@ router.post('/', tokenExtractor, async (request, response) => {
         const project_manager = await Employee_Project.create({ since: new Date(), manager: true, employeeId: request.decodedToken.id, projectId: project.id })
 
         request.body.employees.forEach(async employee => {
-            await Employee_Project.create({ since: new Date(), manager: false, employeeId: employee.id, projectId: project.id })
+            await Employee_Project.create({
+                since: new Date(),
+                manager: false,
+                employeeId: employee.id,
+                projectId: project.id,
+                roleId: employee.role_id
+            })
         });
+
+        response.json(project);
+
     } catch (error) {
         console.log(error)
         return response.status(400).json({ error })
