@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const { User, Employee, Project, Employee_Project, Role } = require('../models')
+const { User, Employee, Project, Employee_Project, Role, Ticket, Ticket_History, Status } = require('../models')
 const { tokenExtractor } = require('../util/middleware')
 
 router.get('/', tokenExtractor, async (request, response) => {
@@ -25,22 +25,35 @@ router.get('/', tokenExtractor, async (request, response) => {
 })
 
 router.get('/:id', async (request, response) => {
-    const project = await Project.findOne({
-        where: { id: request.params.id },
-        include: {
-            model: Employee,
+    try {
+        const project = await Project.findOne({
+            where: { id: request.params.id },
             include: [
-                User
+                {
+                    model: Employee,
+                    include: User
+                },
+                {
+                    model: Ticket,
+                    include: {
+                        model: Ticket_History,
+                        include: Status
+                    }
+                }
             ]
-        }
-    });
+        });
 
-    if (project) {
-        response.json(project);
-    } else {
-        response.status(404).end();
+        if (project) {
+            response.json(project);
+        } else {
+            response.status(404).send('Project not found');
+        }
+    } catch (error) {
+        console.error(error);
+        response.status(500).send(error.message);
     }
 
+    // TODO: consider whether to move ticket fetching to a separate endpoint
 });
 
 router.post('/', tokenExtractor, async (request, response) => {
