@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const { User, Employee, Project, Employee_Project } = require('../models')
+const { User, Employee, Project, Employee_Project, Role, Ticket, Ticket_History, Status } = require('../models')
 const { tokenExtractor } = require('../util/middleware')
 
 router.get('/', tokenExtractor, async (request, response) => {
@@ -23,20 +23,37 @@ router.get('/', tokenExtractor, async (request, response) => {
     // user position.
     response.json(user.employee.projects)
 })
-router.get('/:id', async (request, response, next) => {
+
+router.get('/:id', async (request, response) => {
     try {
         const project = await Project.findOne({
             where: { id: request.params.id },
+            include: [
+                {
+                    model: Employee,
+                    include: User
+                },
+                {
+                    model: Ticket,
+                    include: {
+                        model: Ticket_History,
+                        include: Status
+                    }
+                }
+            ]
         });
 
         if (project) {
             response.json(project);
         } else {
-            response.status(404).end();
+            response.status(404).send('Project not found');
         }
     } catch (error) {
-        next(error);
+        console.error(error);
+        response.status(500).send(error.message);
     }
+
+    // TODO: consider whether to move ticket fetching to a separate endpoint
 });
 
 router.post('/', tokenExtractor, async (request, response) => {
@@ -47,8 +64,17 @@ router.post('/', tokenExtractor, async (request, response) => {
         const project_manager = await Employee_Project.create({ since: new Date(), manager: true, employeeId: request.decodedToken.id, projectId: project.id })
 
         request.body.employees.forEach(async employee => {
-            await Employee_Project.create({ since: new Date(), manager: false, employeeId: employee.id, projectId: project.id })
+            await Employee_Project.create({
+                since: new Date(),
+                manager: false,
+                employeeId: employee.id,
+                projectId: project.id,
+                roleId: employee.role_id
+            })
         });
+
+        response.json(project);
+
     } catch (error) {
         console.log(error)
         return response.status(400).json({ error })

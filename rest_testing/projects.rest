@@ -2,8 +2,8 @@ GET http://localhost:5173/api/projects HTTP/1.1
 content-type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RfYWRtaW5AZ21haWwuY29tIiwiaWQiOjEsImlhdCI6MTcwNTk2NTk5NH0.BaXIH9DyJfq_v4Wf20bAbTMzASrI-Yum0WqgRanp30E
 
- {
- }
+{
+}
 
 ###
 

@@ -1,0 +1,6 @@
+GET http://localhost:3001/api/teams/members HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RfYWRtaW5AZ21haWwuY29tIiwiaWQiOjEsImlhdCI6MTcxMjY4OTQxN30.faJj3rqqit5JiuwHa73YKli5q1sWDjtGkQ5Xko0Ln-U
+
+{
+}
