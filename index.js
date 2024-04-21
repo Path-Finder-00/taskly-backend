@@ -14,6 +14,8 @@ const usersRouter = require('./controllers/users')
 const rolesRouter = require('./controllers/roles')
 const teamsRouter = require('./controllers/teams')
 const ticketsRouter = require('./controllers/tickets')
+const prioritiesRouter = require('./controllers/priorities')
+const typesRouter = require('./controllers/types')
 
 app.use(express.json())
 app.use(cors())
@@ -24,6 +26,8 @@ app.use('/api/users', usersRouter)
 app.use('/api/roles', rolesRouter)
 app.use('/api/teams', teamsRouter)
 app.use('/api/tickets', ticketsRouter)
+app.use('/api/priorities', prioritiesRouter)
+app.use('/api/types', typesRouter)
 
 app.use(middleware.errorHandler)
 

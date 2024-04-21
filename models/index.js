@@ -57,6 +57,7 @@ Priority.hasMany(Ticket_History)
 Ticket.belongsTo(Type, { as: 'TicketType' })
 Type.hasMany(Ticket)
 
+
 module.exports = {
     Project, 
     Employee,
