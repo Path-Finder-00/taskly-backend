@@ -2,15 +2,15 @@ const { Model, DataTypes } = require('sequelize')
 
 const { sequelize } = require('../util/db')
 
-class Priority extends Model {}
+class Type extends Model {}
 
-Priority.init({
+Type.init({
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
     },
-    priority: {
+    type: {
         type: DataTypes.STRING(20),
         allowNull: false
     }
@@ -18,7 +18,7 @@ Priority.init({
     sequelize,
     underscored: true,
     timestamps: false,
-    modelName: 'priority'
+    modelName: 'type'
 })
 
-module.exports = Priority
+module.exports = Type
