@@ -11,6 +11,12 @@ module.exports = {
             name: {
                 type: DataTypes.TEXT,
                 allowNull: false
+            },
+            created_at: {
+                type: DataTypes.DATE
+            },
+            updated_at: {
+                type: DataTypes.DATE
             }
         })
     },

@@ -28,7 +28,8 @@ module.exports = {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 references: { model: 'teams', key: 'id' }
-            }
+            },
+            
         })
     },
     down: async ({ context: queryInterface }) => {

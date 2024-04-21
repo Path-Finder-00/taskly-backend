@@ -10,7 +10,7 @@ module.exports = {
             },
             token: {
                 type: DataTypes.TEXT,
-                primaryKey: true
+                primaryKey: trueś
             },
             created_at: {
                 type: DataTypes.DATE

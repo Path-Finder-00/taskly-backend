@@ -36,7 +36,7 @@ Ticket_History.init({
     },
     date_to: {
         type: DataTypes.DATE,
-        allowNull: false
+        allowNull: true
     }
 }, {
     sequelize,
