@@ -68,29 +68,27 @@ router.get('/', tokenExtractor, async (request, response, next) => {
             SELECT "user"."id", 
                 "user"."name", 
                 "user"."surname", 
-                "e->ep->p"."name" AS "projectName",
-                "e->ep->p->t"."title" AS "title", 
-                "e->ep->p->t"."created_at" AS "createdAt",  
-                "e->ep->p->t->ty"."type" AS "type", 
-                "e->ep->p->t->th->s"."status" AS "status", 
-                "e->ep->p->t->th->pr"."priority" AS "priority" 
+                "e->th->t->p"."name" AS "projectName",
+                "e->th->t"."title" AS "title", 
+                "e->th->t"."created_at" AS "createdAt",  
+                "e->th->t->ty"."type" AS "type", 
+                "e->th->s"."status" AS "status", 
+                "e->th->pr"."priority" AS "priority" 
             FROM "users" AS "user" 
-            LEFT OUTER JOIN "employees" AS "employee" 
+            JOIN "employees" AS "employee" 
                 ON "user"."id" = "employee"."user_id" 
-            LEFT OUTER JOIN "employee_projects" AS "e->ep" 
-                ON "employee"."id" = "e->ep"."employee_id" 
-            LEFT OUTER JOIN "projects" AS "e->ep->p" 
-                ON "e->ep"."project_id" = "e->ep->p"."id" 
-            LEFT OUTER JOIN "tickets" AS "e->ep->p->t" 
-                ON "e->ep->p"."id" = "e->ep->p->t"."project_id" 
-            LEFT OUTER JOIN "types" AS "e->ep->p->t->ty" 
-                ON "e->ep->p->t"."type_id" = "e->ep->p->t->ty"."id" 
-            LEFT OUTER JOIN "ticket_histories" AS "e->ep->p->t->th" 
-                ON "e->ep->p->t"."id" = "e->ep->p->t->th"."ticket_id" 
-            LEFT OUTER JOIN "statuses" AS "e->ep->p->t->th->s" 
-                ON "e->ep->p->t->th"."status_id" = "e->ep->p->t->th->s"."id" 
-            LEFT OUTER JOIN "priorities" AS "e->ep->p->t->th->pr" 
-                ON "e->ep->p->t->th"."priority_id" = "e->ep->p->t->th->pr"."id"
+            JOIN "ticket_histories" AS "e->th" 
+                ON "employee"."id" = "e->th"."employee_id"
+            JOIN "priorities" AS "e->th->pr"
+                ON "e->th->pr"."id" = "e->th"."priority_id"
+            JOIN "statuses" AS "e->th->s"
+                ON "e->th->s"."id" = "e->th"."status_id"
+            JOIN "tickets" AS "e->th->t"
+                ON "e->th->t"."id" = "e->th"."ticket_id"
+            JOIN "types" AS "e->th->t->ty"
+                ON "e->th->t->ty"."id" = "e->th->t"."type_id"
+            JOIN "projects" AS "e->th->t->p"
+                ON "e->th->t->p"."id" = "e->th->t"."project_id"
             WHERE "user"."id" = :userId;
         `, {
             type: sequelize.QueryTypes.SELECT,
