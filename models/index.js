@@ -11,6 +11,7 @@ const Ticket_History = require('./ticket_history')
 const Priority = require('./priority')
 const Status = require('./status')
 const Type = require('./type')
+const User_Ticket = require('./user_ticket')
 
 Employee.belongsToMany(Project, { through: Employee_Project })
 Project.belongsToMany(Employee, { through: Employee_Project })
@@ -40,6 +41,12 @@ Project.hasMany(Ticket)
 
 Ticket.belongsToMany(Employee, { through: Ticket_History })
 Employee.belongsToMany(Ticket, { through: Ticket_History })
+User.belongsToMany(Ticket, { through: User_Ticket})
+Ticket.belongsToMany(User, { through: User_Ticket})
+User_Ticket.belongsTo(User)
+User_Ticket.belongsTo(Ticket)
+Ticket.hasMany(User_Ticket)
+User.hasMany(User_Ticket)
 Ticket_History.belongsTo(Employee)
 Ticket_History.belongsTo(Ticket)
 Ticket.hasMany(Ticket_History)
@@ -71,5 +78,6 @@ module.exports = {
     Ticket_History,
     Priority,
     Status,
-    Type
+    Type,
+    User_Ticket
 } 
