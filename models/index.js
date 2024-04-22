@@ -15,8 +15,8 @@ const Type = require('./type')
 Employee.belongsToMany(Project, { through: Employee_Project })
 Project.belongsToMany(Employee, { through: Employee_Project })
 Employee_Project.belongsTo(Employee)
-Employee_Project.belongsTo(Project, { as: 'Proj' })
-Employee.hasMany(Employee_Project, { as: 'EmpProj' })
+Employee_Project.belongsTo(Project)
+Employee.hasMany(Employee_Project)
 Project.hasMany(Employee_Project)
 
 Employee_Project.belongsTo(Role)
@@ -25,7 +25,7 @@ Role.hasMany(Employee_Project)
 User.hasOne(Session)
 Session.belongsTo(User)
 
-User.hasOne(Employee, { as: 'Emp' })
+User.hasOne(Employee)
 Employee.belongsTo(User)
 
 Team.belongsToMany(Employee, { through: Employment_History })
@@ -36,7 +36,7 @@ Team.hasMany(Employment_History)
 Employee.hasMany(Employment_History)
 
 Ticket.belongsTo(Project)
-Project.hasMany(Ticket, { as: 'ProjTickets' })
+Project.hasMany(Ticket)
 
 Ticket.belongsToMany(Employee, { through: Ticket_History })
 Employee.belongsToMany(Ticket, { through: Ticket_History })
@@ -46,15 +46,15 @@ Ticket.hasMany(Ticket_History)
 Employee.hasMany(Ticket_History)
 
 Ticket_History.belongsTo(Ticket)
-Ticket.hasMany(Ticket_History, { as: 'TickHist' })
+Ticket.hasMany(Ticket_History)
 
-Ticket_History.belongsTo(Status, { as: 'TickStatus' })
+Ticket_History.belongsTo(Status)
 Status.hasMany(Ticket_History)
 
-Ticket_History.belongsTo(Priority, { as: 'TickPriority' })
+Ticket_History.belongsTo(Priority)
 Priority.hasMany(Ticket_History)
 
-Ticket.belongsTo(Type, { as: 'TicketType' })
+Ticket.belongsTo(Type)
 Type.hasMany(Ticket)
 
 
