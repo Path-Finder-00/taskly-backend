@@ -1,6 +1,7 @@
 const router = require('express').Router()
 
-const { User, Employee, Project, Employee_Project, Role, Ticket, Ticket_History, Status } = require('../models')
+const { User, Employee, Project, Employee_Project, Ticket, Ticket_History, Status, User_Ticke } = require('../models')
+const User_Ticket = require('../models/user_ticket')
 const { tokenExtractor } = require('../util/middleware')
 
 router.get('/', tokenExtractor, async (request, response) => {
@@ -35,10 +36,15 @@ router.get('/:id', async (request, response) => {
                 },
                 {
                     model: Ticket,
-                    include: {
-                        model: Ticket_History,
-                        include: Status
-                    }
+                    include: [
+                        {
+                            model: Ticket_History,
+                            include: Status
+                        },
+                        {
+                            model: User_Ticket
+                        }
+                    ]
                 }
             ]
         });
@@ -53,7 +59,7 @@ router.get('/:id', async (request, response) => {
         response.status(500).send(error.message);
     }
 
-    // TODO: consider whether to move ticket fetching to a separate endpoint
+    // TODO: move to seperate endpoints
 });
 
 router.post('/', tokenExtractor, async (request, response) => {
