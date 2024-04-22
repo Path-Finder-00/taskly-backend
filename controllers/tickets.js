@@ -65,7 +65,7 @@ router.get('/', tokenExtractor, async (request, response, next) => {
         //         }
         //     ]
         sequelize.query(`
-            SELECT "user"."id", 
+            SELECT "e->th->t"."id", 
                 "user"."name", 
                 "user"."surname", 
                 "e->th->t->p"."name" AS "projectName",
