@@ -22,6 +22,11 @@ Ticket.init({
         type: DataTypes.INTEGER,
         allowNull: false,
         references: { model: 'projects', key: 'id' }
+    },
+    typeId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: { model: 'types', key: 'id' }
     }
 }, {
     sequelize,

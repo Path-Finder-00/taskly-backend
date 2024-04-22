@@ -32,7 +32,7 @@ Ticket_History.init({
     },
     date_since: {
         type: DataTypes.DATE,
-        allowNull: false
+        allowNull: true
     },
     date_to: {
         type: DataTypes.DATE,

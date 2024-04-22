@@ -2,7 +2,7 @@ const router = require('express').Router()
 const { sequelize } = require('../util/db')
 const { Op } = require('sequelize')
 
-const { Ticket, Project, Employee, User, Priority, Status, Type, Ticket_History, Employee_Project } = require('../models')
+const { Ticket, Project, Employee, User, Priority, Status, Type, Ticket_History, Employee_Project, User_Ticket } = require('../models')
 const { tokenExtractor } = require('../util/middleware')
 
 router.get('/', tokenExtractor, async (request, response, next) => {
@@ -99,6 +99,38 @@ router.get('/', tokenExtractor, async (request, response, next) => {
     } catch (error) {
         console.log(error)
         next(error)
+    }
+})
+
+router.post('/', tokenExtractor, async (request, response) => {
+
+    try {
+        const user = await User.findByPk(request.decodedToken.id)
+        const ticket = await Ticket.create({
+            title: request.body.title,
+            description: request.body.description,
+            created_at: new Date(),
+            projectId: request.body.project,
+            typeId: request.body.type
+        })
+        const ticket_history = await Ticket_History.create({
+            employeeId: request.body.assigned,
+            statusId: 1,
+            priorityId: request.body.priority,
+            ticketId: ticket.id,
+            date_since: request.body.assigned ? new Date() : null,
+            created_at: new Date()
+        })
+        const user_ticket = await User_Ticket.create({
+            ticket_id: ticket.id,
+            user_id: user.id
+        })
+
+        response.json(ticket);
+
+    } catch (error) {
+        console.log(error)
+        return response.status(400).json({ error })
     }
 })
 
