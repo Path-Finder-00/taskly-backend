@@ -65,7 +65,7 @@ router.get('/', tokenExtractor, async (request, response, next) => {
         //         }
         //     ]
         sequelize.query(`
-            SELECT "user"."id", 
+            SELECT "e->th->t"."id", 
                 "user"."name", 
                 "user"."surname", 
                 "e->th->t->p"."name" AS "projectName",
@@ -133,5 +133,35 @@ router.post('/', tokenExtractor, async (request, response) => {
         return response.status(400).json({ error })
     }
 })
+
+router.get('/:id', async (request, response) => {
+    try {
+        const ticket = await Ticket.findOne({
+            where: { id: request.params.id },
+            include: [
+                {
+                    model: User_Ticket,
+                    attributes: ['id'],
+                    include: {
+                        model: User,
+                        attributes: ['name', 'surname']
+                    }
+                }, 
+                {
+                    model: Ticket_History,
+                }
+            ]
+        });
+
+        if (ticket) {
+            response.json(ticket);
+        } else {
+            response.status(404).send('Ticket not found');
+        }
+    } catch (error) {
+        console.error(error);
+        response.status(500).send(error.message);
+    }
+});
 
 module.exports = router
