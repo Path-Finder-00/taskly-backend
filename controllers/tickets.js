@@ -115,15 +115,15 @@ router.post('/', tokenExtractor, async (request, response) => {
         })
         const ticket_history = await Ticket_History.create({
             employeeId: request.body.assigned,
-            statusId: 1,
+            statusId: request.body.assigned ? 2 : 1,
             priorityId: request.body.priority,
             ticketId: ticket.id,
             date_since: request.body.assigned ? new Date() : null,
             created_at: new Date()
         })
         const user_ticket = await User_Ticket.create({
-            ticket_id: ticket.id,
-            user_id: user.id
+            ticketId: ticket.id,
+            userId: user.id
         })
 
         response.json(ticket);
@@ -161,6 +161,47 @@ router.get('/:id', async (request, response) => {
     } catch (error) {
         console.error(error);
         response.status(500).send(error.message);
+    }
+});
+
+router.put('/:ticketId', tokenExtractor, async (request, response) => {
+    const ticketId = request.params.ticketId;
+
+    try {
+        const ticket = await Ticket.findByPk(ticketId);
+        if (!ticket) {
+            return response.status(404).json({ error: 'Ticket not found' });
+        }
+        
+        ticket.title = request.body.title ?? ticket.title;
+        ticket.description = request.body.description ?? ticket.description;
+        ticket.projectId = request.body.project ?? ticket.projectId;
+        ticket.typeId = request.body.type ?? ticket.typeId;
+        
+        const lastHistory = await Ticket_History.findOne({
+            where: { ticket_id: ticketId },
+            order: [['createdAt', 'DESC']]
+        });
+        if (lastHistory && !lastHistory.date_to) {
+            lastHistory.date_to = new Date();
+            await lastHistory.save();
+        }
+
+        const ticket_history = await Ticket_History.create({
+            employeeId: request.body.assigned,
+            statusId: request.body.assigned ? 2 : 1,
+            priorityId: request.body.priority,
+            ticketId: ticket.id,
+            date_since: request.body.assigned ? new Date() : null,
+            created_at: new Date()
+        })
+        await ticket.save();
+
+        response.json(ticket);
+
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({ error: 'Internal server error' });
     }
 });
 
