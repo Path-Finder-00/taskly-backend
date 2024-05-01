@@ -89,7 +89,13 @@ router.get('/', tokenExtractor, async (request, response, next) => {
                 ON "e->th->t->ty"."id" = "e->th->t"."type_id"
             JOIN "projects" AS "e->th->t->p"
                 ON "e->th->t->p"."id" = "e->th->t"."project_id"
-            WHERE "user"."id" = :userId;
+            WHERE "user"."id" = :userId AND "e->th"."id" IN (
+                    SELECT find_last_edit.last_edit
+                    FROM ( SELECT ticket_id, MAX(id) AS last_edit
+                        FROM ticket_histories
+                        GROUP BY ticket_id
+                    ) find_last_edit
+                )
         `, {
             type: sequelize.QueryTypes.SELECT,
             replacements: { userId: request.decodedToken.id },
