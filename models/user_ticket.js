@@ -10,15 +10,15 @@ User_Ticket.init({
         primaryKey: true,
         autoIncrement: true
     },
-    ticket_id: {
+    ticketId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: { model: 'ticket', key: 'id' }
     },
-    user_id: {
+    userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: { model: 'users', key: 'id' }
+        references: { model: 'user', key: 'id' }
     }
 }, {
     sequelize,
