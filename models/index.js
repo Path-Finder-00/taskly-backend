@@ -12,6 +12,12 @@ const Priority = require('./priority')
 const Status = require('./status')
 const Type = require('./type')
 const User_Ticket = require('./user_ticket')
+const Technology = require('./technology')
+const Employee_Technology = require('./employee_technology')
+const Organization = require('./organization')
+const Organization_Team = require('./organization_team')
+const Client = require('./client')
+const Client_Project = require('./client_project')
 
 Employee.belongsToMany(Project, { through: Employee_Project })
 Project.belongsToMany(Employee, { through: Employee_Project })
@@ -64,6 +70,36 @@ Priority.hasMany(Ticket_History)
 Ticket.belongsTo(Type)
 Type.hasMany(Ticket)
 
+Technology.belongsToMany(Employee, { through: Employee_Technology })
+Employee.belongsToMany(Technology, { through: Employee_Technology })
+
+Employee_Technology.belongsTo(Technology)
+Employee_Technology.belongsTo(Employee)
+
+Employee.hasMany(Employee_Technology)
+Technology.hasMany(Employee_Technology)
+
+Team.belongsToMany(Organization, { through: Organization_Team })
+Organization.belongsToMany(Team, { through: Organization_Team })
+
+Organization_Team.belongsTo(Team)
+Organization_Team.belongsTo(Organization)
+
+Team.hasMany(Organization_Team)
+Organization.hasMany(Organization_Team)
+
+User.hasOne(Client)
+Client.belongsTo(User)
+
+Organization.hasMany(Client)
+Client.belongsTo(Organization)
+
+Client.belongsToMany(Project, { through: Client_Project })
+Project.belongsToMany(Client, { through: Client_Project })
+Client_Project.belongsTo(Client)
+Client_Project.belongsTo(Project)
+Client.hasMany(Client_Project)
+Project.hasMany(Client_Project)
 
 module.exports = {
     Project, 
@@ -79,5 +115,11 @@ module.exports = {
     Priority,
     Status,
     Type,
-    User_Ticket
+    User_Ticket,
+    Technology,
+    Employee_Technology,
+    Organization,
+    Organization_Team,
+    Client,
+    Client_Project
 } 
