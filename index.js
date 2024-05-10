@@ -20,6 +20,7 @@ const statusesRouter = require('./controllers/statuses')
 // const employeesRouter = require('./controllers/employees')
 const ticketHistoriesRouter = require('./controllers/ticket_histories')
 const commentsRouter = require('./controllers/comments')
+const attachmentsRouter = require('./controllers/attachments')
 
 app.use(express.json())
 app.use(cors())
@@ -36,6 +37,7 @@ app.use('/api/statuses', statusesRouter)
 // app.use('/api/employees', employeesRouter)
 app.use('/api/ticket_histories', ticketHistoriesRouter)
 app.use('/api/comments', commentsRouter)
+app.use('/api/attachments', attachmentsRouter)
 
 app.use(middleware.errorHandler)
 

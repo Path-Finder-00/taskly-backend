@@ -13,6 +13,7 @@ const Status = require('./status')
 const Type = require('./type')
 const User_Ticket = require('./user_ticket')
 const Comment = require('./comment')
+const Attachment = require('./attachment')
 
 Employee.belongsToMany(Project, { through: Employee_Project })
 Project.belongsToMany(Employee, { through: Employee_Project })
@@ -72,6 +73,13 @@ Comment.belongsTo(User)
 Ticket.hasMany(Comment)
 User.hasMany(Comment)
 
+Ticket.belongsToMany(User, { through: Attachment })
+User.belongsToMany(Ticket, { through: Attachment })
+Attachment.belongsTo(Ticket)
+Attachment.belongsTo(User)
+Ticket.hasMany(Attachment)
+User.hasMany(Attachment)
+
 module.exports = {
     Project, 
     Employee,
@@ -87,5 +95,6 @@ module.exports = {
     Status,
     Type,
     User_Ticket,
-    Comment
+    Comment,
+    Attachment
 } 

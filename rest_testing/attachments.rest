@@ -1,0 +1,6 @@
+GET http://localhost:3001/api/attachments/19/Zrzut%20ekranu%202024-05-9%20o%2014.45.25.png HTTP/1.1
+content-type: image/png
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Indyb2JlbEBnbWFpbC5jb20iLCJpZCI6NiwiaWF0IjoxNzEzNzIxMzQ2fQ.QUTZLrcoc8O1KRdbraymwtPHFfyDok9jjIXBw2nZL-Y
+
+{
+}

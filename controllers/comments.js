@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const { User, Employee, Project, Employee_Project, Ticket, Comment } = require('../models')
+const { User, Ticket, Comment } = require('../models')
 const { tokenExtractor } = require('../util/middleware')
 
 router.get('/:id', tokenExtractor, async (request, response) => {
