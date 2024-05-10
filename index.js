@@ -25,6 +25,7 @@ const organizationTeamsRouter = require('./controllers/organization_teams')
 const employmentHistoriesRouter = require('./controllers/employment_histories')
 const employeeProjectsRouter = require('./controllers/employee_projects')
 const clientsRouter = require('./controllers/clients')
+const commentsRouter = require('./controllers/comments')
 
 app.use(express.json())
 app.use(cors())
@@ -46,6 +47,7 @@ app.use('/api/organization_teams', organizationTeamsRouter)
 app.use('/api/employment_histories', employmentHistoriesRouter)
 app.use('/api/employee_projects', employeeProjectsRouter)
 app.use('/api/clients', clientsRouter)
+app.use('/api/comments', commentsRouter)
 
 app.use(middleware.errorHandler)
 
