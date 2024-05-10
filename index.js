@@ -26,6 +26,7 @@ const employmentHistoriesRouter = require('./controllers/employment_histories')
 const employeeProjectsRouter = require('./controllers/employee_projects')
 const clientsRouter = require('./controllers/clients')
 const commentsRouter = require('./controllers/comments')
+const attachmentsRouter = require('./controllers/attachments')
 
 app.use(express.json())
 app.use(cors())
@@ -48,6 +49,7 @@ app.use('/api/employment_histories', employmentHistoriesRouter)
 app.use('/api/employee_projects', employeeProjectsRouter)
 app.use('/api/clients', clientsRouter)
 app.use('/api/comments', commentsRouter)
+app.use('/api/attachments', attachmentsRouter)
 
 app.use(middleware.errorHandler)
 

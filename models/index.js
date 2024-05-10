@@ -19,6 +19,7 @@ const Organization_Team = require('./organization_team')
 const Client = require('./client')
 const Client_Project = require('./client_project')
 const Comment = require('./comment')
+const Attachment = require('./attachment')
 
 Employee.belongsToMany(Project, { through: Employee_Project })
 Project.belongsToMany(Employee, { through: Employee_Project })
@@ -108,6 +109,13 @@ Comment.belongsTo(User)
 Ticket.hasMany(Comment)
 User.hasMany(Comment)
 
+Ticket.belongsToMany(User, { through: Attachment })
+User.belongsToMany(Ticket, { through: Attachment })
+Attachment.belongsTo(Ticket)
+Attachment.belongsTo(User)
+Ticket.hasMany(Attachment)
+User.hasMany(Attachment)
+
 module.exports = {
     Project, 
     Employee,
@@ -129,5 +137,6 @@ module.exports = {
     Organization_Team,
     Client,
     Client_Project,
-    Comment
+    Comment,
+    Attachment
 } 
