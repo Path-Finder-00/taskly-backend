@@ -2,7 +2,7 @@ const router = require('express').Router()
 const { sequelize } = require('../util/db')
 const { Op } = require('sequelize')
 
-const { Team, Employee, User, Employment_History } = require('../models')
+const { Team, Employee, User, Employment_History, Organization_Team } = require('../models')
 const { tokenExtractor } = require('../util/middleware')
 
 router.get('/members', tokenExtractor, async (request, response, next) => {
@@ -47,6 +47,25 @@ router.get('/members', tokenExtractor, async (request, response, next) => {
         })
     } catch (error) {
         next(error)
+    }
+})
+
+router.post('/', tokenExtractor, async (request, response) => {
+
+    try {
+        const team = await Team.create({
+            name: request.body.name
+        })
+        const organization_team = await Organization_Team.create({
+            organizationId: request.body.organization,
+            teamId: team.id
+        })
+
+        response.json(team);
+
+    } catch (error) {
+        console.log(error)
+        return response.status(400).json({ error })
     }
 })
 

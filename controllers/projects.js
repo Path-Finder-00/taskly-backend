@@ -175,10 +175,13 @@ router.put('/:projectId', tokenExtractor, async (request, response) => {
             where: { projectId: projectId }
         });
 
+        console.log("currentemployees")
+        console.log(currentEmployees)
+
         const incomingEmployeeIds = new Set(request.body.employees.map(emp => emp.id));
 
         for (const currentEmployee of currentEmployees) {
-            if (!incomingEmployeeIds.has(currentEmployee.employeeId)) {
+            if (!incomingEmployeeIds.has(currentEmployee.employeeId) && !currentEmployee.to) {
                 currentEmployee.to = new Date();
                 await currentEmployee.save();
             }
@@ -186,6 +189,8 @@ router.put('/:projectId', tokenExtractor, async (request, response) => {
 
         for (const employee of request.body.employees) {
             const existingEmployee = currentEmployees.find(ep => ep.employeeId === employee.id);
+            console.log("existingEmployee")
+            console.log(existingEmployee)
 
             if (!existingEmployee) {
                 employee_project = await Employee_Project.create({
@@ -195,9 +200,15 @@ router.put('/:projectId', tokenExtractor, async (request, response) => {
                     projectId: projectId,
                     roleId: employee.role_id
                 })
-            } if (existingEmployee.roleId !== employee.role_id) {
-                existingEmployee.roleId = employee.role_id;
-                await existingEmployee.save();
+            } else {
+                if (existingEmployee.to) {
+                    existingEmployee.to = null;
+                    await existingEmployee.save();
+                }
+                if (existingEmployee.roleId !== employee.role_id) {
+                    existingEmployee.roleId = employee.role_id;
+                    await existingEmployee.save();
+                }
             }
         }
 
