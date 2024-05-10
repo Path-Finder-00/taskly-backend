@@ -2,23 +2,23 @@ const { Model, DataTypes } = require('sequelize')
 
 const { sequelize } = require('../util/db')
 
-class Team extends Model {}
+class Organization extends Model {}
 
-Team.init({
+Organization.init({
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
     },
     name: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(50),
         allowNull: false
     }
 }, {
     sequelize,
     underscored: true,
     timestamps: false,
-    modelName: 'team'
+    modelName: 'organization'
 })
 
-module.exports = Team
+module.exports = Organization
