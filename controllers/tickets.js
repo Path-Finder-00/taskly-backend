@@ -112,6 +112,11 @@ router.post('/', tokenExtractor, async (request, response) => {
 
     try {
         const user = await User.findByPk(request.decodedToken.id)
+
+        if (request.body.assigned && user.access_id === 5) {
+            return response.status(403).message("Only employees can assign a developer.")
+        }
+        
         const ticket = await Ticket.create({
             title: request.body.title,
             description: request.body.description,
@@ -172,8 +177,11 @@ router.get('/:id', async (request, response) => {
 
 router.put('/:ticketId', tokenExtractor, async (request, response) => {
     const ticketId = request.params.ticketId;
-
+    const user = await User.findByPk(request.decodedToken.id)
     try {
+        if (request.body.assigned && user.access_id === 5) {
+            return response.status(403).message("Only employees can assign a developer.")
+        }
         const ticket = await Ticket.findByPk(ticketId);
         if (!ticket) {
             return response.status(404).json({ error: 'Ticket not found' });

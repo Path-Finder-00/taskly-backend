@@ -138,20 +138,25 @@ router.post('/', tokenExtractor, async (request, response) => {
 
     try {
         const user = await User.findByPk(request.decodedToken.id)
-        const project = await Project.create({ name: request.body.name, description: request.body.description })
-        const project_manager = await Employee_Project.create({ since: new Date(), manager: true, employeeId: request.decodedToken.id, projectId: project.id })
 
-        request.body.employees.forEach(async employee => {
-            await Employee_Project.create({
-                since: new Date(),
-                manager: false,
-                employeeId: employee.id,
-                projectId: project.id,
-                roleId: employee.role_id
-            })
-        });
+        if (user.access_id <= 2) {
+            const project = await Project.create({ name: request.body.name, description: request.body.description })
+            const project_manager = await Employee_Project.create({ since: new Date(), manager: true, employeeId: request.decodedToken.id, projectId: project.id })
 
-        response.json(project);
+            request.body.employees.forEach(async employee => {
+                await Employee_Project.create({
+                    since: new Date(),
+                    manager: false,
+                    employeeId: employee.id,
+                    projectId: project.id,
+                    roleId: employee.role_id
+                })
+            });
+
+            response.json(project);
+        } else {
+            return response.status(403).message("You need at least Team Lead privileges to create a project.")
+        }
 
     } catch (error) {
         console.log(error)
@@ -163,58 +168,62 @@ router.put('/:projectId', tokenExtractor, async (request, response) => {
     const projectId = request.params.projectId;
 
     try {
-        const project = await Project.findByPk(projectId);
-        if (!project) {
-            return response.status(404).json({ error: 'Project not found' });
-        }
-
-        project.name = request.body.name ?? project.name;
-        project.description = request.body.description ?? project.description;
-
-        const currentEmployees = await Employee_Project.findAll({
-            where: { projectId: projectId }
-        });
-
-        console.log("currentemployees")
-        console.log(currentEmployees)
-
-        const incomingEmployeeIds = new Set(request.body.employees.map(emp => emp.id));
-
-        for (const currentEmployee of currentEmployees) {
-            if (!incomingEmployeeIds.has(currentEmployee.employeeId) && !currentEmployee.to) {
-                currentEmployee.to = new Date();
-                await currentEmployee.save();
+        const user = await User.findByPk(request.decodedToken.id)
+        if (user.access_id <= 3) {
+            const project = await Project.findByPk(projectId);
+            if (!project) {
+                return response.status(404).json({ error: 'Project not found' });
             }
-        }
 
-        for (const employee of request.body.employees) {
-            const existingEmployee = currentEmployees.find(ep => ep.employeeId === employee.id);
-            console.log("existingEmployee")
-            console.log(existingEmployee)
+            project.name = request.body.name ?? project.name;
+            project.description = request.body.description ?? project.description;
 
-            if (!existingEmployee) {
-                employee_project = await Employee_Project.create({
-                    since: new Date(),
-                    manager: false,
-                    employeeId: employee.id,
-                    projectId: projectId,
-                    roleId: employee.role_id
-                })
-            } else {
-                if (existingEmployee.to) {
-                    existingEmployee.to = null;
-                    await existingEmployee.save();
-                }
-                if (existingEmployee.roleId !== employee.role_id) {
-                    existingEmployee.roleId = employee.role_id;
-                    await existingEmployee.save();
+            const currentEmployees = await Employee_Project.findAll({
+                where: { projectId: projectId }
+            });
+
+            console.log("currentemployees")
+            console.log(currentEmployees)
+
+            const incomingEmployeeIds = new Set(request.body.employees.map(emp => emp.id));
+
+            for (const currentEmployee of currentEmployees) {
+                if (!incomingEmployeeIds.has(currentEmployee.employeeId) && !currentEmployee.to) {
+                    currentEmployee.to = new Date();
+                    await currentEmployee.save();
                 }
             }
+
+            for (const employee of request.body.employees) {
+                const existingEmployee = currentEmployees.find(ep => ep.employeeId === employee.id);
+                console.log("existingEmployee")
+                console.log(existingEmployee)
+
+                if (!existingEmployee) {
+                    employee_project = await Employee_Project.create({
+                        since: new Date(),
+                        manager: false,
+                        employeeId: employee.id,
+                        projectId: projectId,
+                        roleId: employee.role_id
+                    })
+                } else {
+                    if (existingEmployee.to) {
+                        existingEmployee.to = null;
+                        await existingEmployee.save();
+                    }
+                    if (existingEmployee.roleId !== employee.role_id) {
+                        existingEmployee.roleId = employee.role_id;
+                        await existingEmployee.save();
+                    }
+                }
+            }
+
+            await project.save();
+            response.json(project);
+        } else {
+            return response.status(403).message("You need at least Project Manager privileges to modify a project.")
         }
-
-        await project.save();
-        response.json(project);
-
     } catch (error) {
         console.log(error);
         response.status(500).json({ error: 'Internal server error' });

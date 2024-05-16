@@ -9,3 +9,7 @@ INSERT INTO employees ("user_id") VALUES (1);
 --- Connect an employee to a project
 
 INSERT INTO employee_projects ("since", "employee_id", "project_id") values (current_timestamp, 1, 1);
+
+--- Insert into table "Accesses"
+
+INSERT INTO accesses ("name") values ('Admin'), ('Team Lead'), ('Project Manager'), ('Employee'), ('Client');
