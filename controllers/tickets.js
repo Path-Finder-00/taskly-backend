@@ -7,63 +7,6 @@ const { tokenExtractor } = require('../util/middleware')
 
 router.get('/', tokenExtractor, async (request, response, next) => {
     try {
-        // const user = await User.findOne({
-        //     where: {
-        //         id: request.decodedToken.id
-        //     },
-        //     attributes: ['name', 'surname'],
-        //     include: [
-        //         {
-        //             model: Employee,
-        //             as: 'Emp',
-        //             attributes: [],
-        //             include: [
-        //                 {
-        //                     model: Employee_Project,
-        //                     as: 'EmpProj',
-        //                     attributes: [],
-        //                     include: [
-        //                         {
-        //                             model: Project,
-        //                             as: 'Proj',
-        //                             attributes: ['name'],
-        //                             include: [
-        //                                 {
-        //                                     model: Ticket,
-        //                                     as: 'ProjTickets',
-        //                                     attributes: ['title', 'created_at'],
-        //                                     include: [
-        //                                         {
-        //                                             model: Type,
-        //                                             as: 'TicketType',
-        //                                             attributes: ['type'],
-        //                                         },
-        //                                         {
-        //                                             model: Ticket_History,
-        //                                             as: 'TickHist',
-        //                                             attributes: [],
-        //                                             include: [
-        //                                                 {
-        //                                                     model: Status,
-        //                                                     as: 'TickStatus',
-        //                                                     attributes: ['status'],
-        //                                                 },
-        //                                                 {
-        //                                                     model: Priority,
-        //                                                     as: 'TickPriority',
-        //                                                     attributes: ['priority']
-        //                                                 }
-        //                                             ]
-        //                                         }
-        //                                     ]
-        //                                 }
-        //                             ]
-        //                         }
-        //                     ]
-        //                 }
-        //             ],
-        //         }
-        //     ]
         sequelize.query(`
             SELECT "e->th->t"."id", 
                 "user"."name", 
