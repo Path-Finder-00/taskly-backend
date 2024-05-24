@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs')
 const router = require('express').Router()
 const { User, Employee, Employment_History, Employee_Technology, Employee_Project, Client, Client_Project, Technology } = require('../models')
+const { tokenExtractor } = require('../util/middleware')
 
 router.post('/', async (request, response) => {
     const { name, surname, email, password, phone, admin } = request.body
@@ -82,7 +83,7 @@ router.get('/:id', async (request, response) => {
                     // attributes: ['technology']
                 },
             },
-            attributes: ['email', 'id', 'name', 'surname', 'phone']
+            attributes: ['email', 'id', 'name', 'surname', 'phone', 'admin']
         });
 
         if (user) {
@@ -157,6 +158,31 @@ router.put('/:userId', async (request, response) => {
                     technologyId: techId
                 });
             }
+
+            const employment_histories = await Employment_History.findAll({
+                where: { employee_id: employee.id }
+            })
+
+            const current = employment_histories.find(eh => eh.to === null)
+
+            if (current) {
+                if (current.teamId !== request.body.team) {
+                    current.to = new Date();
+                    await current.save();
+
+                    await Employment_History.create({
+                        employeeId: employee.id,
+                        teamId: request.body.team,
+                        since: new Date(),
+                        to: null,
+                        team_lead: request.body.team_lead
+                    });
+                } else if (current.team_lead != request.body.team_lead) {
+                    current.team_lead = request.body.team_lead
+                    await current.save();
+                }
+            }
+
         }
 
         response.json(user)

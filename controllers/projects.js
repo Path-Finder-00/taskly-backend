@@ -11,8 +11,13 @@ router.get('/', tokenExtractor, async (request, response) => {
         include: [
             {
                 model: Employee,
-                include: [
-                    Project
+                include: [{
+                    model: Project,
+                    through: {
+                        model: Employee_Project,
+                        where: { to: null }
+                    }
+                }
                 ]
             }
         ]
@@ -201,26 +206,31 @@ router.put('/:projectId', tokenExtractor, async (request, response) => {
         }
 
         for (const employee of request.body.employees) {
-            const existingEmployee = currentEmployees.find(ep => ep.employeeId === employee.id);
-            console.log("existingEmployee")
-            console.log(existingEmployee)
+            const activeEmployee = currentEmployees.find(ep => ep.employeeId === employee.id && !ep.to);
+            const inactiveEmployee = currentEmployees.find(ep => ep.employeeId === employee.id && ep.to);
 
-            if (!existingEmployee) {
-                employee_project = await Employee_Project.create({
-                    since: new Date(),
-                    manager: false,
-                    employeeId: employee.id,
-                    projectId: projectId,
-                    roleId: employee.role_id
-                })
-            } else {
-                if (existingEmployee.to) {
-                    existingEmployee.to = null;
-                    await existingEmployee.save();
+            if (!activeEmployee) {
+                if (inactiveEmployee) {
+                    await Employee_Project.create({
+                        since: new Date(),
+                        manager: false,
+                        employeeId: employee.id,
+                        projectId: projectId,
+                        roleId: employee.role_id
+                    });
+                } else {
+                    await Employee_Project.create({
+                        since: new Date(),
+                        manager: false,
+                        employeeId: employee.id,
+                        projectId: projectId,
+                        roleId: employee.role_id
+                    });
                 }
-                if (existingEmployee.roleId !== employee.role_id) {
-                    existingEmployee.roleId = employee.role_id;
-                    await existingEmployee.save();
+            } else {
+                if (activeEmployee.roleId !== employee.role_id) {
+                    activeEmployee.roleId = employee.role_id;
+                    await activeEmployee.save();
                 }
             }
         }
