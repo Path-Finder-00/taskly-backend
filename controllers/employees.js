@@ -1,7 +1,7 @@
-// const router = require('express').Router()
+const router = require('express').Router()
 
-// const { User, Employee, Project, Employee_Project, Ticket, Ticket_History, Status, User_Ticket } = require('../models')
-// const { tokenExtractor } = require('../util/middleware')
+const { User, Employee, Team, Organization } = require('../models')
+const { tokenExtractor } = require('../util/middleware')
 
 // router.get('/:id', async (request, response) => {
 //     try {
@@ -25,4 +25,43 @@
 //     }
 // });
 
-// module.exports = router
+router.get('/all', tokenExtractor, async (request, response) => {
+    try {
+        // retrieving the user's organization.id
+        const employee = await Employee.findOne({
+            where: { user_id: request.decodedToken.id },
+            include: {
+                model: Team,
+                include: {
+                    model: Organization
+                }
+            }
+        })
+        const organizationId = employee.teams[0].organizations[0].id;
+
+        const employeesInOrganization = await User.findAll({
+            include: {
+                model: Employee,
+                include: {
+                    model: Team,
+                    include: {
+                        model: Organization,
+                        where: { id: organizationId }
+                    },
+                    required: true
+                },
+                required: true
+            },
+            attributes: ['email', 'id', 'name', 'surname', 'phone']
+        });
+
+        response.json(employeesInOrganization)
+
+    } catch (error) {
+        console.error(error);
+        response.status(500).send(error.message);
+    }
+});
+
+module.exports = router
+
