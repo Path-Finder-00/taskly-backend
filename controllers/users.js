@@ -3,7 +3,7 @@ const router = require('express').Router()
 const { User, Employee, Employment_History, Employee_Technology, Employee_Project, Client, Client_Project, Technology } = require('../models')
 
 router.post('/', async (request, response) => {
-    const { name, surname, email, password, phone, accessId } = request.body
+    const { name, surname, email, password, phone, admin, technologies, team, project, team_lead, role, is_client } = request.body
 
     if (password.length < 8) {
         return response.status(400).json({
@@ -21,25 +21,24 @@ router.post('/', async (request, response) => {
         passwordHash: passwordHash,
         phone: phone,
         disabled: false,
-        accessId: accessId
+        accessId: admin ? 1 : team_lead ? 2 : is_client ? 4 : 3
     })
 
-    if (!request.body.is_client === true) {
+    if (!is_client === true) {
         const employee = await Employee.create({
             userId: user.id
         })
 
-        if (request.body.team !== "" && request.body.team != null) {
-            employment_history = await Employment_History.create({
+        if (team !== "" && team != null) {
+            const employment_history = await Employment_History.create({
                 employeeId: employee.id,
-                team_lead: request.body.team_lead,
-                teamId: request.body.team,
+                teamId: team,
                 since: new Date()
             })
         }
 
-        if (request.body.technologies && request.body.technologies.length > 0) {
-            request.body.technologies.forEach(async technology => {
+        if (technologies && technologies.length > 0) {
+            technologies.forEach(async technology => {
                 await Employee_Technology.create({
                     employeeId: employee.id,
                     technologyId: technology
@@ -47,23 +46,23 @@ router.post('/', async (request, response) => {
             });
         }
 
-        if (request.body.project !== "" && request.body.project != null) {
-            employee_project = await Employee_Project.create({
+        if (project !== "" && project != null) {
+            const employee_project = await Employee_Project.create({
                 employeeId: employee.id,
-                projectId: request.body.project,
+                projectId: project,
                 since: new Date(),
-                roleId: request.body.role,
+                roleId: role,
                 manager: false
             })
         }
-    } else if (!request.body.is_client === false) {
-        client = await Client.create({
+    } else if (request.body.is_client === true) {
+        const client = await Client.create({
             organizationId: request.body.organization,
             userId: user.id
         })
-        client_project = await Client_Project.create({
+        const client_project = await Client_Project.create({
             clientId: client.id,
-            projectId: request.body.project,
+            projectId: project,
             since: new Date()
         })
     }

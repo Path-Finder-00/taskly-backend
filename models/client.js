@@ -10,11 +10,6 @@ Client.init({
         primaryKey: true,
         autoIncrement: true
     },
-    organizationId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: { model: 'organizations', key: 'id' }
-    },
     userId: {
         type: DataTypes.INTEGER,
         allowNull: false,

@@ -15,10 +15,6 @@ module.exports = {
             to: {
                 type: DataTypes.DATE
             },
-            team_lead: {
-                type: DataTypes.BOOLEAN,
-                defaultValue: false
-            },
             employee_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,

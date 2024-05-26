@@ -58,10 +58,10 @@ router.post('/', tokenExtractor, async (request, response) => {
             const team = await Team.create({
                 name: request.body.name
             })
-            const organization_team = await Organization_Team.create({
-                organizationId: request.body.organization,
-                teamId: team.id
-            })
+            // const organization_team = await Organization_Team.create({
+            //     organizationId: request.body.organization,
+            //     teamId: team.id
+            // })
 
             response.json(team);
         } else {

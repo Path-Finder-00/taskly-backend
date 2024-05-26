@@ -17,9 +17,6 @@ Employment_History.init({
     to: {
         type: DataTypes.DATE
     },
-    teamLead: {
-        type: DataTypes.BOOLEAN
-    },
     employeeId: {
         type: DataTypes.INTEGER,
         allowNull: false,

@@ -18,6 +18,11 @@ module.exports = {
             allowNull: false,
             references: { model: 'organizations', key: 'id' }
         })
+        await queryInterface.addColumn('users', 'organization_id', {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: { model: 'organizations', key: 'id' }
+        })
     },
     down: async ({ context: queryInterface }) => {
         await queryInterface.dropTable('organizations')

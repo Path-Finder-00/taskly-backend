@@ -8,11 +8,6 @@ module.exports = {
                 primaryKey: true,
                 autoIncrement: true
             },
-            organization_id: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-                references: { model: 'organizations', key: 'id' }
-            },
             user_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
