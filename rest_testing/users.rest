@@ -2,9 +2,10 @@ POST http://localhost:3001/api/users HTTP/1.1
 content-type: application/json
 
 {
-    "name": "Łukasz",
-    "surname": " Wróbel",
-    "email": "wrobel@gmail.com",
+    "name": "Admin",
+    "surname": "Testowy",
+    "email": "admin@gmail.com",
     "password": "password",
-    "phone": "+48111111111"
+    "phone": "+48111111111",
+    "accessId": 1
 }

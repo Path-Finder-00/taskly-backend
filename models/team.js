@@ -11,7 +11,11 @@ Team.init({
         autoIncrement: true
     },
     name: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(50),
+        allowNull: false
+    },
+    organizationId: {
+        type: DataTypes.INTEGER,
         allowNull: false
     }
 }, {

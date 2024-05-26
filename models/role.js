@@ -11,7 +11,7 @@ Role.init({
         autoIncrement: true
     },
     role: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(20),
         allowNull: false
     }
 }, {

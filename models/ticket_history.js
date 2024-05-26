@@ -30,11 +30,11 @@ Ticket_History.init({
         allowNull: false,
         references: { model: 'ticket', key: 'id' }
     },
-    date_since: {
+    since: {
         type: DataTypes.DATE,
         allowNull: true
     },
-    date_to: {
+    to: {
         type: DataTypes.DATE,
         allowNull: true
     }

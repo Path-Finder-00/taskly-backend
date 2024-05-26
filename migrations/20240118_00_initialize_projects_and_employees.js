@@ -9,11 +9,11 @@ module.exports = {
                 autoIncrement: true
             },
             name: {
-                type: DataTypes.TEXT,
+                type: DataTypes.STRING(80),
                 allowNull: false
             },
             description: {
-                type: DataTypes.TEXT,
+                type: DataTypes.STRING(150),
                 allowNull: false
             },
             created_at: {
@@ -52,6 +52,12 @@ module.exports = {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 references: { model: 'projects', key: 'id' }
+            },
+            created_at: {
+                type: DataTypes.DATE
+            },
+            updated_at: {
+                type: DataTypes.DATE
             }
         })
     },

@@ -15,7 +15,7 @@ const User_Ticket = require('./user_ticket')
 const Technology = require('./technology')
 const Employee_Technology = require('./employee_technology')
 const Organization = require('./organization')
-const Organization_Team = require('./organization_team')
+// const Organization_Team = require('./organization_team')
 const Client = require('./client')
 const Client_Project = require('./client_project')
 const Comment = require('./comment')
@@ -82,14 +82,14 @@ Employee_Technology.belongsTo(Employee)
 Employee.hasMany(Employee_Technology)
 Technology.hasMany(Employee_Technology)
 
-Team.belongsToMany(Organization, { through: Organization_Team })
-Organization.belongsToMany(Team, { through: Organization_Team })
+// Team.belongsToMany(Organization, { through: Organization_Team })
+// Organization.belongsToMany(Team, { through: Organization_Team })
 
-Organization_Team.belongsTo(Team)
-Organization_Team.belongsTo(Organization)
+// Organization_Team.belongsTo(Team)
+// Organization_Team.belongsTo(Organization)
 
-Team.hasMany(Organization_Team)
-Organization.hasMany(Organization_Team)
+// Team.hasMany(Organization_Team)
+// Organization.hasMany(Organization_Team)
 
 User.hasOne(Client)
 Client.belongsTo(User)
@@ -138,7 +138,7 @@ module.exports = {
     Technology,
     Employee_Technology,
     Organization,
-    Organization_Team,
+    // Organization_Team,
     Client,
     Client_Project,
     Comment,

@@ -3,7 +3,7 @@ const router = require('express').Router()
 const { User, Employee, Employment_History, Employee_Technology, Employee_Project, Client, Client_Project, Technology } = require('../models')
 
 router.post('/', async (request, response) => {
-    const { name, surname, email, password, phone, admin } = request.body
+    const { name, surname, email, password, phone, accessId } = request.body
 
     if (password.length < 8) {
         return response.status(400).json({
@@ -20,8 +20,8 @@ router.post('/', async (request, response) => {
         email: email,
         passwordHash: passwordHash,
         phone: phone,
-        admin: admin,
         disabled: false,
+        accessId: accessId
     })
 
     if (!request.body.is_client === true) {

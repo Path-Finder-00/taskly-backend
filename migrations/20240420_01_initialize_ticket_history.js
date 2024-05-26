@@ -2,43 +2,36 @@ const { DataTypes } = require('sequelize')
 
 module.exports = {
     up: async ({ context: queryInterface }) => {
-        await queryInterface.createTable('teams', {
+        await queryInterface.createTable('ticket_histories', {
             id: {
                 type: DataTypes.INTEGER,
                 primaryKey: true,
                 autoIncrement: true
             },
-            employeeId: {
+            employee_id: {
                 type: DataTypes.INTEGER,
                 allowNull: true,
-                references: { model: 'employee', key: 'id' }
+                references: { model: 'employees', key: 'id' }
             },
-            statusId: {
+            ticket_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
-                references: { model: 'status', key: 'id' }
+                references: { model: 'tickets', key: 'id' }
             },
-            priorityId: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-                references: { model: 'priority', key: 'id' }
-            },
-            ticketId: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-                references: { model: 'ticket', key: 'id' }
-            },
-            date_since: {
-                type: DataTypes.DATE,
-                allowNull: false
-            },
-            date_to: {
+            since: {
                 type: DataTypes.DATE,
                 allowNull: true
-            },  
+            },
+            to: {
+                type: DataTypes.DATE,
+                allowNull: true
+            },
+            created_at: {
+                type: DataTypes.DATE
+            } 
         })
     },
     down: async ({ context: queryInterface }) => {
-        await queryInterface.dropTable('teams')
+        await queryInterface.dropTable('ticket_histories')
     }
 }

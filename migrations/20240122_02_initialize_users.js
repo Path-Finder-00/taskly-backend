@@ -39,10 +39,6 @@ module.exports = {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false
             },
-            admin: {
-                type: DataTypes.BOOLEAN,
-                defaultValue: false
-            },
             created_at: {
                 type: DataTypes.DATE
             },
@@ -50,8 +46,14 @@ module.exports = {
                 type: DataTypes.DATE
             }
         })
+        await queryInterface.addColumn('employees', 'user_id', {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: { model: 'users', key: 'id' }
+        })
     },
     down: async ({ context: queryInterface }) => {
         await queryInterface.dropTable('users')
+        await queryInterface.removeColumn('employees', 'user_id')
     }
 }

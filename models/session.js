@@ -11,7 +11,7 @@ Session.init({
       autoIncrement: true
   },
   token: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       primaryKey: true
   },
   userId: {

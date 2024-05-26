@@ -11,11 +11,11 @@ Ticket.init({
         autoIncrement: true
     },
     title: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(80),
         allowNull: false
     },
     description: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(200),
         allowNull: false
     },
     projectId: {

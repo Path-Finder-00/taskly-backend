@@ -11,13 +11,12 @@ module.exports = {
             name: {
                 type: DataTypes.STRING(20),
                 allowNull: false
-            },
-            created_at: {
-                type: DataTypes.DATE
-            },
-            updated_at: {
-                type: DataTypes.DATE
             }
+        })
+        await queryInterface.addColumn('users', 'access_id', {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: { model: 'accesses', key: 'id' }
         })
     },
     down: async ({ context: queryInterface }) => {

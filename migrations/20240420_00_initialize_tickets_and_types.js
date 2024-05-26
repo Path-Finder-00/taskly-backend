@@ -9,7 +9,7 @@ module.exports = {
                 autoIncrement: true
             },
             type: {
-                type: DataTypes.TEXT,
+                type: DataTypes.STRING(20),
                 allowNull: false
             }
         })
@@ -20,19 +20,19 @@ module.exports = {
                 autoIncrement: true
             },
             title: {
-                type: DataTypes.TEXT,
+                type: DataTypes.STRING(80),
                 allowNull: false
             },
             description: {
-                type: DataTypes.TEXT,
+                type: DataTypes.STRING(200),
                 allowNull: false
             },
-            projectId: {
+            project_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 references: { model: 'projects', key: 'id' }
             },
-            typeId: {
+            type_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 references: { model: 'types', key: 'id' }

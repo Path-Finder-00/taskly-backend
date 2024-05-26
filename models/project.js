@@ -11,11 +11,11 @@ Project.init({
         autoIncrement: true
     },
     name: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(80),
         allowNull: false
     },
     description: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(150),
         allowNull: false
     }
 }, {

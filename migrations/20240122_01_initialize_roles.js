@@ -9,9 +9,14 @@ module.exports = {
                 autoIncrement: true
             },
             role: {
-                type: DataTypes.TEXT,
+                type: DataTypes.STRING(20),
                 allowNull: false
             }
+        })
+        await queryInterface.addColumn('employee_projects', 'role_id', {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: { model: 'roles', key: 'id' }
         })
     },
     down: async ({ context: queryInterface }) => {

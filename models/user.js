@@ -11,15 +11,15 @@ User.init({
         autoIncrement: true
     },
     name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(255),
         allowNull: false
     },
     surname: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(255),
         allowNull: false
     },
     email: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(255),
         unique: true,
         allowNull: false,
         validate: {
@@ -33,7 +33,7 @@ User.init({
         allowNull: false
     },
     phone: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(255),
         allowNull: false,
         // TODO: shall we consider country codes? e.g. 123456789, +1123456789, +12123456789, +123123456789, +1234123456789 are valid; 1234567890 is not valid
         validate: {
@@ -49,9 +49,9 @@ User.init({
         type: DataTypes.BOOLEAN,
         defaultValue: false
     },
-    admin: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
+    accessId: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 }, {
     sequelize,

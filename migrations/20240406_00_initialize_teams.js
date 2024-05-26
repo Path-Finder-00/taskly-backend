@@ -9,7 +9,7 @@ module.exports = {
                 autoIncrement: true
             },
             name: {
-                type: DataTypes.TEXT,
+                type: DataTypes.STRING(50),
                 allowNull: false
             },
             created_at: {
