@@ -54,19 +54,17 @@ router.post('/', tokenExtractor, async (request, response) => {
 
     try {
         const user = await User.findByPk(request.decodedToken.id)
-        if (user.access_id === 1) {
-            const team = await Team.create({
-                name: request.body.name
-            })
-            // const organization_team = await Organization_Team.create({
-            //     organizationId: request.body.organization,
-            //     teamId: team.id
-            // })
 
-            response.json(team);
-        } else {
-            return response.status(403).message("You need at least Admin privileges to create a team.")
-        }
+        const team = await Team.create({
+            name: request.body.name,
+            organizationId: request.body.organization
+        })
+        // const organization_team = await Organization_Team.create({
+        //     organizationId: request.body.organization,
+        //     teamId: team.id
+        // })
+
+        response.json(team);
 
     } catch (error) {
         console.log(error)

@@ -52,12 +52,6 @@ module.exports = {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 references: { model: 'projects', key: 'id' }
-            },
-            created_at: {
-                type: DataTypes.DATE
-            },
-            updated_at: {
-                type: DataTypes.DATE
             }
         })
     },

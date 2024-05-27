@@ -6,6 +6,26 @@ INSERT INTO accesses (name) VALUES ('admin'), ('team_lead'), ('employee'), ('cli
 
 INSERT INTO organizations (name) VALUES ('Testowa Organizacja');
 
+--- Create sample technologies
+
+INSERT INTO technologies (technology) VALUES ('Scala'), ('Java'), ('SQL'), ('React'), ('JavaScript'), ('Node.js'), ('Python');
+
+--- Create sample roles
+
+INSERT INTO roles (role) VALUES ('Menadżer'), ('Team Leader'), ('Grafik'), ('Backend Developer'), ('Frontend Developer'), ('Scrum Master'), ('Klient');
+
+--- Create sample priorities
+
+INSERT INTO priorities (priority) VALUES ('Niski'), ('Średni'), ('Wysoki'), ('Krytyczny');
+
+--- Create sample types
+
+INSERT INTO types (type) VALUES ('Bug'), ('Feature'), ('Change Request');
+
+--- Create sample statuses
+
+INSERT INTO statuses (status) VALUES ('Nowy'), ('Przypisany'), ('W trakcie'), ('Oceniany'), ('Zamknięty');
+
 --- Create a sample project
 
 INSERT INTO projects ("name", "description", "created_at", "updated_at") VALUES ('Testowy Projekt', 'Oto projekt sluzacy do testow.', current_timestamp, current_timestamp);

@@ -27,17 +27,21 @@ const { tokenExtractor } = require('../util/middleware')
 
 router.get('/all', tokenExtractor, async (request, response) => {
     try {
-        // retrieving the user's organization.id
-        const employee = await Employee.findOne({
-            where: { user_id: request.decodedToken.id },
-            include: {
-                model: Team,
-                include: {
-                    model: Organization
-                }
-            }
+        // // retrieving the user's organization.id
+        // const employee = await Employee.findOne({
+        //     where: { user_id: request.decodedToken.id },
+        //     include: {
+        //         model: Team,
+        //         include: {
+        //             model: Organization
+        //         }
+        //     }
+        // })
+
+        // const organizationId = employee.teams[0].organizations[0].id;
+        const user = await User.findOne({
+            where: { id: request.decodedToken.id }
         })
-        const organizationId = employee.teams[0].organizations[0].id;
 
         const employeesInOrganization = await User.findAll({
             include: {
@@ -46,7 +50,7 @@ router.get('/all', tokenExtractor, async (request, response) => {
                     model: Team,
                     include: {
                         model: Organization,
-                        where: { id: organizationId }
+                        where: { id: user.organizationId }
                     },
                     required: true
                 },

@@ -17,9 +17,6 @@ Employee_Project.init({
     to: {
         type: DataTypes.DATE
     },
-    manager: {
-        type: DataTypes.BOOLEAN
-    },
     employeeId: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -29,6 +26,11 @@ Employee_Project.init({
         type: DataTypes.INTEGER,
         allowNull: false,
         references: { model: 'projects', key: 'id' }
+    },
+    roleId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: { model: 'roles', key: 'id' }
     }
 }, {
     sequelize,

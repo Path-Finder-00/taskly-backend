@@ -4,7 +4,7 @@ const { User, Employee, Employment_History, Employee_Technology, Employee_Projec
 const { tokenExtractor } = require('../util/middleware')
 
 router.post('/', async (request, response) => {
-    const { name, surname, email, password, phone, admin, technologies, team, project, team_lead, role, is_client } = request.body
+    const { name, surname, email, password, phone, admin, technologies, team, project, team_lead, role, is_client, organization } = request.body
 
     if (password.length < 8) {
         return response.status(400).json({
@@ -22,7 +22,8 @@ router.post('/', async (request, response) => {
         passwordHash: passwordHash,
         phone: phone,
         disabled: false,
-        accessId: admin ? 1 : team_lead ? 2 : is_client ? 4 : 3
+        accessId: admin ? 1 : team_lead ? 2 : is_client ? 4 : 3,
+        organizationId: organization
     })
 
     if (!is_client === true) {
@@ -58,7 +59,7 @@ router.post('/', async (request, response) => {
         }
     } else if (request.body.is_client === true) {
         const client = await Client.create({
-            organizationId: request.body.organization,
+            organizationId: organization,
             userId: user.id
         })
         const client_project = await Client_Project.create({
@@ -82,7 +83,7 @@ router.get('/:id', async (request, response) => {
                     // attributes: ['technology']
                 },
             },
-            attributes: ['email', 'id', 'name', 'surname', 'phone', 'admin']
+            attributes: ['email', 'id', 'name', 'surname', 'phone', 'accessId']
         });
 
         if (user) {

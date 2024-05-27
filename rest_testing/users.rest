@@ -7,5 +7,6 @@ content-type: application/json
     "email": "admin@gmail.com",
     "password": "password",
     "phone": "+48111111111",
-    "accessId": 1
+    "admin": true,
+    "organization": 1
 }

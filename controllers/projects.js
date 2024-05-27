@@ -15,10 +15,9 @@ router.get('/', tokenExtractor, async (request, response) => {
                     model: Project,
                     through: {
                         model: Employee_Project,
-                        where: { to: null }
+                        // where: { to: null }
                     }
-                }
-                ]
+                }]
             }
         ]
     })
@@ -26,6 +25,7 @@ router.get('/', tokenExtractor, async (request, response) => {
     //TODO: Because both an employee and a client can have projects,
     // make sure that the endpoint return project data regardless of
     // user position.
+    console.log(user)
     response.json(user.employee.projects)
 })
 
@@ -81,8 +81,7 @@ router.get('/availableProjectsByOrganizationId/:id', async (request, response) =
         const sql = `
         SELECT DISTINCT pr.id, pr.name
             FROM organizations org
-            JOIN organization_teams ot ON org.id = ot.organization_id
-            JOIN teams t ON ot.team_id = t.id
+            JOIN teams t ON org.id = t.organization_id
             JOIN employment_histories eh ON t.id = eh.team_id
             JOIN employees e ON eh.employee_id = e.id
             JOIN employee_projects pp ON e.id = pp.employee_id
@@ -155,26 +154,19 @@ router.get('/:id', async (request, response) => {
 router.post('/', tokenExtractor, async (request, response) => {
 
     try {
-        const user = await User.findByPk(request.decodedToken.id)
+        const project = await Project.create({ name: request.body.name, description: request.body.description })
 
-        if (user.access_id <= 2) {
-            const project = await Project.create({ name: request.body.name, description: request.body.description })
-            const project_manager = await Employee_Project.create({ since: new Date(), manager: true, employeeId: request.decodedToken.id, projectId: project.id })
+        request.body.employees.forEach(async employee => {
+            console.log(employee)
+            await Employee_Project.create({
+                since: new Date(),
+                employeeId: employee.id,
+                projectId: project.id,
+                roleId: employee.role_id
+            })
+        });
 
-            request.body.employees.forEach(async employee => {
-                await Employee_Project.create({
-                    since: new Date(),
-                    manager: false,
-                    employeeId: employee.id,
-                    projectId: project.id,
-                    roleId: employee.role_id
-                })
-            });
-
-            response.json(project);
-        } else {
-            return response.status(403).message("You need at least Team Lead privileges to create a project.")
-        }
+        response.json(project);
 
     } catch (error) {
         console.log(error)
@@ -187,7 +179,6 @@ router.put('/:projectId', tokenExtractor, async (request, response) => {
 
     try {
         const user = await User.findByPk(request.decodedToken.id)
-        if (user.access_id <= 3) {
             const project = await Project.findByPk(projectId);
             if (!project) {
                 return response.status(404).json({ error: 'Project not found' });
@@ -244,9 +235,6 @@ router.put('/:projectId', tokenExtractor, async (request, response) => {
 
             await project.save();
             response.json(project);
-        } else {
-            return response.status(403).message("You need at least Project Manager privileges to modify a project.")
-        }
     } catch (error) {
         console.log(error);
         response.status(500).json({ error: 'Internal server error' });

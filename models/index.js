@@ -82,20 +82,14 @@ Employee_Technology.belongsTo(Employee)
 Employee.hasMany(Employee_Technology)
 Technology.hasMany(Employee_Technology)
 
-// Team.belongsToMany(Organization, { through: Organization_Team })
-// Organization.belongsToMany(Team, { through: Organization_Team })
-
-// Organization_Team.belongsTo(Team)
-// Organization_Team.belongsTo(Organization)
-
-// Team.hasMany(Organization_Team)
-// Organization.hasMany(Organization_Team)
+Organization.hasMany(Team)
+Team.belongsTo(Organization)
 
 User.hasOne(Client)
 Client.belongsTo(User)
 
-Organization.hasMany(Client)
-Client.belongsTo(Organization)
+Organization.hasMany(User)
+User.belongsTo(Organization)
 
 Client.belongsToMany(Project, { through: Client_Project })
 Project.belongsToMany(Client, { through: Client_Project })
@@ -103,6 +97,7 @@ Client_Project.belongsTo(Client)
 Client_Project.belongsTo(Project)
 Client.hasMany(Client_Project)
 Project.hasMany(Client_Project)
+
 Ticket.belongsToMany(User, { through: Comment })
 User.belongsToMany(Ticket, { through: Comment })
 Comment.belongsTo(Ticket)

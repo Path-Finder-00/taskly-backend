@@ -55,10 +55,6 @@ router.post('/', tokenExtractor, async (request, response) => {
 
     try {
         const user = await User.findByPk(request.decodedToken.id)
-
-        if (request.body.assigned && user.access_id === 5) {
-            return response.status(403).message("Only employees can assign a developer.")
-        }
         
         const ticket = await Ticket.create({
             title: request.body.title,
@@ -72,8 +68,7 @@ router.post('/', tokenExtractor, async (request, response) => {
             statusId: request.body.assigned ? 2 : 1,
             priorityId: request.body.priority,
             ticketId: ticket.id,
-            date_since: request.body.assigned ? new Date() : null,
-            created_at: new Date()
+            since: request.body.assigned ? new Date() : null
         })
         const user_ticket = await User_Ticket.create({
             ticketId: ticket.id,
@@ -139,8 +134,8 @@ router.put('/:ticketId', tokenExtractor, async (request, response) => {
             where: { ticket_id: ticketId },
             order: [['createdAt', 'DESC']]
         });
-        if (lastHistory && !lastHistory.date_to) {
-            lastHistory.date_to = new Date();
+        if (lastHistory && !lastHistory.to) {
+            lastHistory.to = new Date();
             await lastHistory.save();
         }
 
@@ -149,8 +144,7 @@ router.put('/:ticketId', tokenExtractor, async (request, response) => {
             statusId: request.body.assigned ? 2 : 1,
             priorityId: request.body.priority,
             ticketId: ticket.id,
-            date_since: request.body.assigned ? new Date() : null,
-            created_at: new Date()
+            since: request.body.assigned ? new Date() : null
         })
         await ticket.save();
 

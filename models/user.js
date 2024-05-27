@@ -51,11 +51,13 @@ User.init({
     },
     accessId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        references: { model: 'accesses', key: 'id' }
     },
     organizationId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        references: { model: 'organizations', key: 'id' }
     }
 }, {
     sequelize,

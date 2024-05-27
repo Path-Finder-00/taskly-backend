@@ -16,7 +16,8 @@ Team.init({
     },
     organizationId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        references: { model: 'organizations', key: 'id' },
     }
 }, {
     sequelize,
