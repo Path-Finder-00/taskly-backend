@@ -11,8 +11,13 @@ router.get('/', tokenExtractor, async (request, response) => {
         include: [
             {
                 model: Employee,
-                include: [
-                    Project
+                include: [{
+                    model: Project,
+                    through: {
+                        model: Employee_Project,
+                        where: { to: null }
+                    }
+                }
                 ]
             }
         ]
@@ -111,7 +116,20 @@ router.get('/:id', async (request, response) => {
                     include: [
                         {
                             model: Ticket_History,
-                            include: Status
+                            include: [
+                                {
+                                    model: Status 
+                                },
+                                {
+                                    model: Employee,
+                                    include: [
+                                        {
+                                            model: User,
+                                            attributes: ['name', 'surname']
+                                        }
+                                    ]
+                                }
+                            ]
                         },
                         {
                             model: User_Ticket
@@ -194,30 +212,35 @@ router.put('/:projectId', tokenExtractor, async (request, response) => {
                 }
             }
 
-            for (const employee of request.body.employees) {
-                const existingEmployee = currentEmployees.find(ep => ep.employeeId === employee.id);
-                console.log("existingEmployee")
-                console.log(existingEmployee)
+        for (const employee of request.body.employees) {
+            const activeEmployee = currentEmployees.find(ep => ep.employeeId === employee.id && !ep.to);
+            const inactiveEmployee = currentEmployees.find(ep => ep.employeeId === employee.id && ep.to);
 
-                if (!existingEmployee) {
-                    employee_project = await Employee_Project.create({
+            if (!activeEmployee) {
+                if (inactiveEmployee) {
+                    await Employee_Project.create({
                         since: new Date(),
                         manager: false,
                         employeeId: employee.id,
                         projectId: projectId,
                         roleId: employee.role_id
-                    })
+                    });
                 } else {
-                    if (existingEmployee.to) {
-                        existingEmployee.to = null;
-                        await existingEmployee.save();
-                    }
-                    if (existingEmployee.roleId !== employee.role_id) {
-                        existingEmployee.roleId = employee.role_id;
-                        await existingEmployee.save();
-                    }
+                    await Employee_Project.create({
+                        since: new Date(),
+                        manager: false,
+                        employeeId: employee.id,
+                        projectId: projectId,
+                        roleId: employee.role_id
+                    });
+                }
+            } else {
+                if (activeEmployee.roleId !== employee.role_id) {
+                    activeEmployee.roleId = employee.role_id;
+                    await activeEmployee.save();
                 }
             }
+        }
 
             await project.save();
             response.json(project);
@@ -227,6 +250,52 @@ router.put('/:projectId', tokenExtractor, async (request, response) => {
     } catch (error) {
         console.log(error);
         response.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.get('/projectTickets/:id', async (request, response) => {
+    try {
+        sequelize.query(
+            `SELECT "e->th->t"."id", 
+                "user"."name", 
+                "user"."surname", 
+                "e->th->t->p"."name" AS "projectName",
+                "e->th->t"."title" AS "title", 
+                "e->th->t"."created_at" AS "createdAt",  
+                "e->th->t->ty"."type" AS "type", 
+                "e->th->s"."status" AS "status", 
+                "e->th->pr"."priority" AS "priority" 
+            FROM "users" AS "user" 
+            JOIN "employees" AS "employee" 
+                ON "user"."id" = "employee"."user_id" 
+            FULL JOIN "ticket_histories" AS "e->th" 
+                ON "employee"."id" = "e->th"."employee_id"
+            JOIN "priorities" AS "e->th->pr"
+                ON "e->th->pr"."id" = "e->th"."priority_id"
+            JOIN "statuses" AS "e->th->s"
+                ON "e->th->s"."id" = "e->th"."status_id"
+            JOIN "tickets" AS "e->th->t"
+                ON "e->th->t"."id" = "e->th"."ticket_id"
+            JOIN "types" AS "e->th->t->ty"
+                ON "e->th->t->ty"."id" = "e->th->t"."type_id"
+            JOIN "projects" AS "e->th->t->p"
+                ON "e->th->t->p"."id" = "e->th->t"."project_id"
+            WHERE "e->th->t->p"."id" = :projectId AND "e->th"."id" IN (
+                    SELECT find_last_edit.last_edit
+                    FROM ( SELECT ticket_id, MAX(id) AS last_edit
+                        FROM ticket_histories
+                        GROUP BY ticket_id
+                    ) find_last_edit
+                )` 
+            , {
+            type: sequelize.QueryTypes.SELECT,
+            replacements: { projectId: request.params.id },
+        }).then(tickets => {
+            response.json(tickets)
+        })
+    } catch (error) {
+        console.log(error)
+        next(error)
     }
 });
 
