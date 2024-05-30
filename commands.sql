@@ -1,6 +1,6 @@
 --- Create accesses
 
-INSERT INTO accesses (name) VALUES ('admin'), ('team_lead'), ('employee'), ('client');
+INSERT INTO accesses (name) VALUES ('admin'), ('team_lead'), ('manager'), ('employee'), ('client');
 
 --- Create organization
 
@@ -38,9 +38,21 @@ INSERT INTO employees ("user_id") VALUES (1);
 
 INSERT INTO employee_projects ("since", "employee_id", "project_id") values (current_timestamp, 1, 1);
 
---- Insert into table "Accesses"
+--- Create sample permissions
 
-INSERT INTO accesses ("name") values ('Admin'), ('Team Lead'), ('Project Manager'), ('Employee'), ('Client');
+TRUNCATE TABLE access_permissions, permissions;
+select setval('access_permissions_id_seq', 1, false);
+select setval('permissions_id_seq', 1, false);
+
+INSERT INTO permissions ("name") values ('seeAllUsers'), ('editAnyUser'), ('editUserInTeam'), ('createTeam'), ('createUser'), ('createHighAccessUser'), ('assignUser');
+--- Admin permissions
+INSERT INTO access_permissions ("access_id", "permission_id") VALUES (1, 1), (1, 2), (1, 4), (1, 5), (1, 6), (1, 7);
+--- Team lead permissions
+INSERT INTO access_permissions ("access_id", "permission_id") VALUES (2, 1), (2, 3), (2, 5), (2, 7);
+--- Manager permissions
+INSERT INTO access_permissions ("access_id", "permission_id") VALUES (3, 7);
+--- Employee permissions
+INSERT INTO access_permissions ("access_id", "permission_id") VALUES (4, 7);
 
 --- Drop database
 

@@ -15,12 +15,13 @@ const User_Ticket = require('./user_ticket')
 const Technology = require('./technology')
 const Employee_Technology = require('./employee_technology')
 const Organization = require('./organization')
-// const Organization_Team = require('./organization_team')
 const Client = require('./client')
 const Client_Project = require('./client_project')
 const Comment = require('./comment')
 const Attachment = require('./attachment')
 const Access = require('./access')
+const Permission = require('./permission')
+const Access_Permission = require('./access_permission')
 
 Employee.belongsToMany(Project, { through: Employee_Project })
 Project.belongsToMany(Employee, { through: Employee_Project })
@@ -115,6 +116,13 @@ User.hasMany(Attachment)
 User.belongsTo(Access)
 Access.hasMany(User)
 
+Permission.belongsToMany(Access, { through: Access_Permission })
+Access.belongsToMany(Permission, { through: Access_Permission })
+Access_Permission.belongsTo(Permission)
+Access_Permission.belongsTo(Access)
+Permission.hasMany(Access_Permission)
+Access.hasMany(Access_Permission)
+
 module.exports = {
     Project, 
     Employee,
@@ -133,10 +141,11 @@ module.exports = {
     Technology,
     Employee_Technology,
     Organization,
-    // Organization_Team,
     Client,
     Client_Project,
     Comment,
     Attachment,
-    Access
+    Access,
+    Permission,
+    Access_Permission
 } 

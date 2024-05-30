@@ -22,7 +22,7 @@ router.post('/', async (request, response) => {
         passwordHash: passwordHash,
         phone: phone,
         disabled: false,
-        accessId: admin ? 1 : team_lead ? 2 : is_client ? 4 : 3,
+        accessId: admin ? 1 : team_lead ? 2 : is_client ? 5 : 4,
         organizationId: organization
     })
 

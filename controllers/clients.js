@@ -35,20 +35,23 @@ router.get('/all', tokenExtractor, async (request, response) => {
 
 router.get('/:id', async (request, response) => {
     try {
-        const client = await Client.findOne({
-            where: { userId: request.params.id },
+        const client = await User.findOne({
+            where: { id: request.params.id },
             include: [
                 {
                     model: Organization,
                 },
                 {
-                    model: Client_Project,
+                    model: Client,
                     include: {
-                        model: Project,
-                        attributes: ["name"]
+                        model: Client_Project,
+                        include: {
+                            model: Project
+                        }
                     },
                 }
-            ]
+            ],
+            attributes: { exclude: ['passwordHash'] }
         });
 
         if (client) {
