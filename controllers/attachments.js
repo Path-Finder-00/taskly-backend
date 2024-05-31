@@ -49,11 +49,6 @@ router.post('/:id', tokenExtractor, async (request, response) => {
 
         const mnt = "data"
         const dir = request.params.id
-        // const fname = request.body.name
-        // const abspath = path.format({
-        //     dir: path.join([mnt, dir]),
-        //     base: fname
-        // })
 
         const storage = multer.diskStorage({
             destination: path.join(mnt, dir),
@@ -72,13 +67,11 @@ router.post('/:id', tokenExtractor, async (request, response) => {
 
         upload(request, response, async (err) => {
             if (err) {
-                console.log(err)
                 response.status(300).json(err)
             } else {
                 if (request.file == undefined) {
                     response.status(301).json("Failed to upload the file")
                 } else {
-                    console.log(request.file)
                     const attachment = await Attachment.create({
                         userId: request.decodedToken.id,
                         ticketId: request.params.id,
@@ -101,12 +94,7 @@ router.post('/:id', tokenExtractor, async (request, response) => {
                 }
             }
         })
-
-        
-        
-        // response.status(204).json(newAttachment)
     } catch (error) {
-        console.log(error)
         return response.status(400).json({ error })
     }
 })

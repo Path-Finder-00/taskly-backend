@@ -14,7 +14,7 @@ router.get('/', tokenExtractor, async (request, response) => {
                 include: [{
                     model: Project,
                     through: {
-                        model: Employee_Project,
+                        model: Employee_Project
                         // where: { to: null }
                     }
                 }]
@@ -22,11 +22,30 @@ router.get('/', tokenExtractor, async (request, response) => {
         ]
     })
 
-    //TODO: Because both an employee and a client can have projects,
-    // make sure that the endpoint return project data regardless of
-    // user position.
-    console.log(user)
     response.json(user.employee.projects)
+})
+
+router.get('/projectsWithRoles', tokenExtractor, async (request, response) => {
+    const user = await User.findOne({
+        where: {
+            id: request.decodedToken.id
+        },
+        include: {
+            model: Employee,
+            include: {
+                model: Employee_Project,
+                include: {
+                    model: Project
+                }
+            }
+        }
+    })
+
+    console.log(user)
+
+    const projectsWithRoles = user.employee.employee_projects.map(project => ({ role: project.roleId, project: project.project }))
+
+    response.json(projectsWithRoles)
 })
 
 router.get('/availableProjectsByTeamId/:id', async (request, response) => {
@@ -76,7 +95,6 @@ router.get('/availableProjectsByTeamId/:id', async (request, response) => {
 router.get('/availableProjectsByOrganizationId/:id', async (request, response) => {
     try {
         const orgId = request.params.id;
-        console.log(orgId)
 
         const sql = `
         SELECT DISTINCT pr.id, pr.name

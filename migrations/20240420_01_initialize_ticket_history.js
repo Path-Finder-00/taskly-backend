@@ -28,7 +28,10 @@ module.exports = {
             },
             created_at: {
                 type: DataTypes.DATE
-            } 
+            },
+            updated_at : {
+                type: DataTypes.DATE
+            }
         })
     },
     down: async ({ context: queryInterface }) => {

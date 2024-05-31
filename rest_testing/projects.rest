@@ -34,3 +34,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RfY
         }
     ]
 }
+
+###
+
+GET http://localhost:3001/api/projects/projectsWithRoles HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hbmFnZXJAZ21haWwuY29tIiwiaWQiOjMsImlhdCI6MTcxNzE5MzU5OH0.D9QW7eHYGLbZFsQQck6IQ4dyWNhWUmY-7T7cxGr34oo
+
+{
+}
