@@ -7,44 +7,87 @@ const { tokenExtractor } = require('../util/middleware')
 
 router.get('/', tokenExtractor, async (request, response, next) => {
     try {
-        sequelize.query(`
-            SELECT "e->th->t"."id", 
-                "user"."name", 
-                "user"."surname", 
-                "e->th->t->p"."name" AS "projectName",
-                "e->th->t"."title" AS "title", 
-                "e->th->t"."created_at" AS "createdAt",  
-                "e->th->t->ty"."type" AS "type", 
-                "e->th->s"."status" AS "status", 
-                "e->th->pr"."priority" AS "priority" 
-            FROM "users" AS "user" 
-            JOIN "employees" AS "employee" 
-                ON "user"."id" = "employee"."user_id" 
-            JOIN "ticket_histories" AS "e->th" 
-                ON "employee"."id" = "e->th"."employee_id"
-            JOIN "priorities" AS "e->th->pr"
-                ON "e->th->pr"."id" = "e->th"."priority_id"
-            JOIN "statuses" AS "e->th->s"
-                ON "e->th->s"."id" = "e->th"."status_id"
-            JOIN "tickets" AS "e->th->t"
-                ON "e->th->t"."id" = "e->th"."ticket_id"
-            JOIN "types" AS "e->th->t->ty"
-                ON "e->th->t->ty"."id" = "e->th->t"."type_id"
-            JOIN "projects" AS "e->th->t->p"
-                ON "e->th->t->p"."id" = "e->th->t"."project_id"
-            WHERE "user"."id" = :userId AND "e->th"."id" IN (
+        const user = await User.findByPk(request.decodedToken.id)
+
+        if (user.accessId !== 5) { // Check whether the user is not a client
+            sequelize.query(`
+                SELECT "e->th->t"."id", 
+                    "user"."name", 
+                    "user"."surname", 
+                    "e->th->t->p"."name" AS "projectName",
+                    "e->th->t"."title" AS "title", 
+                    "e->th->t"."created_at" AS "createdAt",  
+                    "e->th->t->ty"."type" AS "type", 
+                    "e->th->s"."status" AS "status", 
+                    "e->th->pr"."priority" AS "priority" 
+                FROM "users" AS "user" 
+                JOIN "employees" AS "employee" 
+                    ON "user"."id" = "employee"."user_id" 
+                JOIN "ticket_histories" AS "e->th" 
+                    ON "employee"."id" = "e->th"."employee_id"
+                JOIN "priorities" AS "e->th->pr"
+                    ON "e->th->pr"."id" = "e->th"."priority_id"
+                JOIN "statuses" AS "e->th->s"
+                    ON "e->th->s"."id" = "e->th"."status_id"
+                JOIN "tickets" AS "e->th->t"
+                    ON "e->th->t"."id" = "e->th"."ticket_id"
+                JOIN "types" AS "e->th->t->ty"
+                    ON "e->th->t->ty"."id" = "e->th->t"."type_id"
+                JOIN "projects" AS "e->th->t->p"
+                    ON "e->th->t->p"."id" = "e->th->t"."project_id"
+                WHERE "user"."id" = :userId AND "e->th"."id" IN (
+                        SELECT find_last_edit.last_edit
+                        FROM ( SELECT ticket_id, MAX(id) AS last_edit
+                            FROM ticket_histories
+                            GROUP BY ticket_id
+                        ) find_last_edit
+                    )
+            `, {
+                type: sequelize.QueryTypes.SELECT,
+                replacements: { userId: request.decodedToken.id },
+            }).then(tickets => {
+                response.json(tickets)
+            })
+        } else {
+            sequelize.query(`
+                SELECT "ut->t"."id",
+                    "user"."name",
+                    "user"."surname",
+                    "ut->t->p"."name" AS "projectName",
+                    "ut->t"."title" AS "title",
+                    "ut->t"."created_at" AS "createdAt",
+                    "ut->t->ty"."type" AS "type",
+                    "ut->t->th->s"."status" AS "status",
+                    "ut->t->th->pr"."priority" AS "priority"
+                FROM "users" AS "user"
+                JOIN "user_tickets" AS "userTickets"
+                    ON "user"."id" = "userTickets"."user_id"
+                JOIN "tickets" AS "ut->t"
+                    ON "userTickets"."ticket_id" = "ut->t"."id"
+                JOIN "projects" AS "ut->t->p"
+                    ON "ut->t"."project_id" = "ut->t->p"."id"
+                JOIN "types" AS "ut->t->ty"
+                    ON "ut->t"."type_id" = "ut->t->ty"."id"
+                JOIN "ticket_histories" AS "ut->t->th"
+                    ON "ut->t"."id" = "ut->t->th"."ticket_id"
+                JOIN "statuses" AS "ut->t->th->s"
+                    ON "ut->t->th"."status_id" = "ut->t->th->s"."id"
+                JOIN "priorities" AS "ut->t->th->pr"
+                    ON "ut->t->th"."priority_id" = "ut->t->th->pr"."id"
+                WHERE "user"."id" = :userId AND "ut->t->th"."id" IN (
                     SELECT find_last_edit.last_edit
                     FROM ( SELECT ticket_id, MAX(id) AS last_edit
                         FROM ticket_histories
                         GROUP BY ticket_id
                     ) find_last_edit
                 )
-        `, {
-            type: sequelize.QueryTypes.SELECT,
-            replacements: { userId: request.decodedToken.id },
-        }).then(tickets => {
-            response.json(tickets)
-        })
+            `, {
+                type: sequelize.QueryTypes.SELECT,
+                replacements: { userId: request.decodedToken.id },
+            }).then(tickets => {
+                response.json(tickets)
+            })
+        }
     } catch (error) {
         console.log(error)
         next(error)

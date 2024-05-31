@@ -26,46 +26,34 @@ router.post('/', async (request, response) => {
         organizationId: organization
     })
 
-    if (!is_client === true) {
-        const employee = await Employee.create({
-            userId: user.id
-        })
+    const employee = await Employee.create({
+        userId: user.id
+    })
 
-        if (team !== "" && team != null) {
-            const employment_history = await Employment_History.create({
-                employeeId: employee.id,
-                teamId: team,
-                since: new Date()
-            })
-        }
-
-        if (technologies && technologies.length > 0) {
-            technologies.forEach(async technology => {
-                await Employee_Technology.create({
-                    employeeId: employee.id,
-                    technologyId: technology
-                })
-            });
-        }
-
-        if (project !== "" && project != null) {
-            const employee_project = await Employee_Project.create({
-                employeeId: employee.id,
-                projectId: project,
-                since: new Date(),
-                roleId: role,
-                manager: false
-            })
-        }
-    } else if (request.body.is_client === true) {
-        const client = await Client.create({
-            organizationId: organization,
-            userId: user.id
-        })
-        const client_project = await Client_Project.create({
-            clientId: client.id,
-            projectId: project,
+    if (team !== "" && team != null) {
+        const employment_history = await Employment_History.create({
+            employeeId: employee.id,
+            teamId: team,
             since: new Date()
+        })
+    }
+
+    if (technologies && technologies.length > 0) {
+        technologies.forEach(async technology => {
+            await Employee_Technology.create({
+                employeeId: employee.id,
+                technologyId: technology
+            })
+        });
+    }
+
+    if (project !== "" && project != null) {
+        const employee_project = await Employee_Project.create({
+            employeeId: employee.id,
+            projectId: project,
+            since: new Date(),
+            roleId: role,
+            manager: false
         })
     }
 

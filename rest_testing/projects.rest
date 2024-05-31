@@ -1,6 +1,15 @@
 GET http://localhost:3001/api/projects HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Indyb2JlbEBnbWFpbC5jb20iLCJpZCI6NiwiaWF0IjoxNzEzNzIxMzQ2fQ.QUTZLrcoc8O1KRdbraymwtPHFfyDok9jjIXBw2nZL-Y
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hbmFnZXJAZ21haWwuY29tIiwiaWQiOjMsImlhdCI6MTcxNzE2MjU1NX0.xCtEw48l24I1CINUsHs7GKa2SKmAKSd0VeZ4B-bOa0M
+
+{
+}
+
+###
+
+GET http://localhost:3001/api/projects/6 HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hbmFnZXJAZ21haWwuY29tIiwiaWQiOjMsImlhdCI6MTcxNzE2MjU1NX0.xCtEw48l24I1CINUsHs7GKa2SKmAKSd0VeZ4B-bOa0M
 
 {
 }
