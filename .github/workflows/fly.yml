@@ -40,8 +40,8 @@ jobs:
       
       - name: Copy dist from front-end
         run: |
-          rm -r Path-Finder-00/taskly-backend/dist/
-          cp -r Path-Finder-00/taskly-frontend/dist/ Path-Finder-00/taskly-backend/dist/
+          rm -r ${GITHUB_WORKSPACE}/dist/
+          cp -r ${GITHUB_WORKSPACE}/dist/ ${GITHUB_WORKSPACE}/dist/
 
   deploy:
     name: Deploy app
