@@ -25,6 +25,28 @@ router.get('/', tokenExtractor, async (request, response) => {
     response.json(user.employee.projects)
 })
 
+router.get('/user/:id', async (request, response) => {
+    const user = await User.findOne({
+        where: {
+            id: request.params.id
+        },
+        include: [
+            {
+                model: Employee,
+                include: [{
+                    model: Project,
+                    through: {
+                        model: Employee_Project
+                        // where: { to: null }
+                    }
+                }]
+            }
+        ]
+    })
+
+    response.json(user.employee.projects)
+})
+
 router.get('/projectsWithRoles', tokenExtractor, async (request, response) => {
     const user = await User.findOne({
         where: {
