@@ -1,0 +1,6 @@
+GET http://localhost:3001/api/tickets HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImtsaWVudDZAZ21haWwuY29tIiwiaWQiOjEyLCJpYXQiOjE3MTcxNzI3MTl9.pm7RsFjHNHuuRpGjBXQvuxkMqJ4qwUS80qc1s6L99AU
+
+{
+}

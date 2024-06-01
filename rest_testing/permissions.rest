@@ -1,0 +1,6 @@
+GET http://localhost:3001/api/permissions HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImlkIjoxLCJpYXQiOjE3MTcwODYxMDV9.E3OV6oCjywbMju1t6mrOvSBYLPleyHlxx8TWuk08Fwk
+
+{
+}
