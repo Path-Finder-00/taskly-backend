@@ -1,0 +1,54 @@
+
+
+name: Fly Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  trigger_frontend_workflow:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        users: actions/checkout@4
+    
+      - name: Trigger Frontend Workflow
+        run: |
+          curl -X POST -H "Accept: application/vnd.github.v3+json" \
+          -H "Authorization: token ${{ secrets.TASKLY_FRONTEND_TOKEN }}" \
+          https://api.github.com/repos/Path-Finder-00/taskly-frontend/dispatches \
+          -d '{"event_type":"run-workflow"}'
+
+  fetch_file:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout back-end
+        uses: actions/checkout@v4
+
+      - name: Checkout front-end
+        run: |
+          git clone https://github.com/Path-Finder-00/taskly-frontend.git
+          cd taskly-frontend
+          git checkout main
+        env:
+          GITHUB_TOKEN: ${{ secrets.TASKLY_FRONTEND_TOKEN }}
+      
+      - name: Copy dist from front-end
+        run: |
+          rm -r taskly-backend/dist/
+          cp -r taskly-frontend/dist/ taskly-backend/dist/
+
+  deploy:
+    name: Deploy app
+    runs-on: ubuntu-latest
+    concurrency: deploy-group
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

@@ -1,5 +1,6 @@
 const express = require('express')
 const cors = require('cors')
+const { expressCspHeader, NONE, SELF, INLINE } = require('express-csp-header')
 require('express-async-errors')
 const app = express()
 
@@ -30,6 +31,22 @@ const permissionsRouter = require('./controllers/permissions')
 
 app.use(express.json())
 app.use(cors())
+
+app.use(expressCspHeader({
+  directives: {
+    'default-src': [SELF, 'http://localhost:3001'],
+    'img-src': [SELF, 'http://localhost:3001'],
+    'script-src': [SELF, INLINE],
+    'style-src': [SELF, INLINE],
+    'connect-src': [SELF, 'http://localhost:3001'],
+    'font-src': [SELF],
+    'object-src': [NONE],
+    'media-src': [SELF],
+    'frame-src': [NONE]
+  }
+}));
+
+app.use(express.static('dist'))
 
 app.use('/api/projects', projectsRouter)
 app.use('/api/login', loginRouter)
