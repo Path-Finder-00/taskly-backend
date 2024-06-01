@@ -25,6 +25,7 @@ jobs:
       - name: Get Frontend Workflow Run ID
         id: get_run_id
         run: |
+          sleep 30
           run_id=$(curl -s -H "Authorization: token ${{ secrets.TASKLY_FRONTEND_TOKEN }}" \
           "https://api.github.com/repos/Path-Finder-00/taskly-frontend/actions/runs?event=repository_dispatch&per_page=1" \
           | jq -r '.workflow_runs[0].id')
