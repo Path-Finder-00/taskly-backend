@@ -35,11 +35,11 @@ jobs:
           git clone https://github.com/Path-Finder-00/taskly-frontend.git
           cd taskly-frontend
           git checkout main
-          ls -R
         env:
           GITHUB_TOKEN: ${{ secrets.TASKLY_FRONTEND_TOKEN }}
       
       - name: Copy dist from front-end
+        run: ls -R
         run: |
           rm -r ${GITHUB_WORKSPACE}/dist
           cp -r ${GITHUB_WORKSPACE}/dist/ ${GITHUB_WORKSPACE}/dist
