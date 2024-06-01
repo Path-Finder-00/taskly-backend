@@ -22,6 +22,24 @@ jobs:
           https://api.github.com/repos/Path-Finder-00/taskly-frontend/dispatches \
           -d '{"event_type":"run-workflow"}'
 
+      - name: Wait for Frontend Workflow Completion
+        id: wait
+        run: |
+          repo="Path-Finder-00/taskly-frontend"
+          workflow_id="run-workflow"  # replace with your workflow id
+          status="in_progress"
+          while [[ "$status" == "in_progress" || "$status" == "queued" ]]; do
+            sleep 30
+            status=$(curl -s -H "Authorization: token ${{ secrets.TASKLY_FRONTEND_TOKEN }}" \
+            "https://api.github.com/repos/$repo/actions/runs?event=repository_dispatch" \
+            | jq -r '.workflow_runs[] | select(.name=="run-workflow") | .status')
+            echo "Current status: $status"
+          done
+          if [[ "$status" != "completed" ]]; then
+            echo "Workflow did not complete successfully"
+            exit 1
+          fi
+
   fetch_file:
     needs: trigger_frontend_workflow
     runs-on: ubuntu-latest
