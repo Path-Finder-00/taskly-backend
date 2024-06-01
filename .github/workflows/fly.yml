@@ -37,9 +37,11 @@ jobs:
           git checkout main
         env:
           GITHUB_TOKEN: ${{ secrets.TASKLY_FRONTEND_TOKEN }}
+
+      - name: List files
+        run: ls -R
       
       - name: Copy dist from front-end
-        run: ls -R
         run: |
           rm -r ${GITHUB_WORKSPACE}/dist
           cp -r ${GITHUB_WORKSPACE}/dist/ ${GITHUB_WORKSPACE}/dist
