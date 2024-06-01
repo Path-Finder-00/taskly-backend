@@ -68,7 +68,7 @@ jobs:
   deploy:
     name: Deploy app
     runs-on: ubuntu-latest
-    needs: fetch_file
+    needs: trigger_frontend_workflow
     concurrency: deploy-group
     steps:
       - uses: actions/checkout@v4
