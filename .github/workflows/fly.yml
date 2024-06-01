@@ -50,27 +50,20 @@ jobs:
             exit 1
           fi
 
-  fetch_file:
-    needs: trigger_frontend_workflow
-    runs-on: ubuntu-latest
-
-    steps:
       - name: Checkout back-end
         uses: actions/checkout@v4
 
       - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: ./
+        run: |
+          run_id=${{ steps.get_run_id.outputs.run_id }}
+          artifacts_url=$(curl -s -H "Authorization: token ${{ secrets.TASKLY_FRONTEND_TOKEN }}" \
+          "https://api.github.com/repos/Path-Finder-00/taskly-frontend/actions/runs/$run_id/artifacts" \
+          | jq -r '.artifacts[0].archive_download_url')
+          curl -L -H "Authorization: token ${{ secrets.TASKLY_FRONTEND_TOKEN }}" $artifacts_url --output dist.zip
+          unzip dist.zip -d ./
 
       - name: List files
         run: ls -R
-      
-      - name: Copy dist from front-end
-        run: |
-          rm -r ./dist/
-          cp -r ./dist/ ./dist/
 
   deploy:
     name: Deploy app
