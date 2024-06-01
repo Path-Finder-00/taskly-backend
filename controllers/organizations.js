@@ -1,7 +1,7 @@
 const router = require('express').Router()
 
 const { User, Organization, Team } = require('../models')
-const { tokenExtractor } = require('../util/middleware')
+const { tokenExtractor, checkPermissions } = require('../util/middleware')
 
 router.get('/', tokenExtractor, async (request, response) => {
     try {
@@ -24,7 +24,7 @@ router.get('/', tokenExtractor, async (request, response) => {
     }
 });
 
-router.get('/users', tokenExtractor, async (request, response) => {
+router.get('/users', tokenExtractor, checkPermissions(['seeAllUsers']),  async (request, response) => {
     try {
         const user = await User.findOne({
             where: {

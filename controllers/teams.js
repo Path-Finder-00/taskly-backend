@@ -2,8 +2,8 @@ const router = require('express').Router()
 const { sequelize } = require('../util/db')
 const { Op } = require('sequelize')
 
-const { Team, Employee, User, Employment_History,  } = require('../models')
-const { tokenExtractor } = require('../util/middleware')
+const { Team, Employee, User, Employment_History } = require('../models')
+const { tokenExtractor, checkPermissions } = require('../util/middleware')
 
 router.get('/members', tokenExtractor, async (request, response, next) => {
     try {
@@ -85,7 +85,7 @@ router.get('/teamNames', tokenExtractor, async (request, response) => {
     }
 })
 
-router.post('/', tokenExtractor, async (request, response) => {
+router.post('/', tokenExtractor, checkPermissions(['createTeam']), async (request, response) => {
 
     try {
         const user = await User.findByPk(request.decodedToken.id)
@@ -94,10 +94,6 @@ router.post('/', tokenExtractor, async (request, response) => {
             name: request.body.name,
             organizationId: request.body.organization
         })
-        // const organization_team = await Organization_Team.create({
-        //     organizationId: request.body.organization,
-        //     teamId: team.id
-        // })
 
         response.json(team);
 

@@ -1,14 +1,22 @@
 const bcrypt = require('bcryptjs')
 const router = require('express').Router()
-const { User, Employee, Employment_History, Employee_Technology, Employee_Project, Client, Client_Project, Technology } = require('../models')
-const { tokenExtractor } = require('../util/middleware')
+const { User, Employee, Employment_History, Employee_Technology, Employee_Project, Technology } = require('../models')
+const { tokenExtractor, checkPermissions } = require('../util/middleware')
+const { getPermissions } = require('../util/getPermissions')
 
-router.post('/', async (request, response) => {
+router.post('/', tokenExtractor, checkPermissions(['createUser']), async (request, response) => {
+    console.log(request.body)
     const { name, surname, email, password, phone, admin, technologies, team, project, team_lead, role, is_client, organization } = request.body
 
     if (password.length < 8) {
         return response.status(400).json({
             error: 'Password has to be at least 8 characters long'
+        })
+    }
+    const hasPermission = await getPermissions(request.decodedToken.id, ['createHighAccessUser'])
+    if (!hasPermission && (admin || team_lead)) {
+        return response.status(403).json({
+            error: 'Forbidden'
         })
     }
 
@@ -60,7 +68,7 @@ router.post('/', async (request, response) => {
     response.status(201).json(user)
 })
 
-router.get('/:id', async (request, response) => {
+router.get('/:id', tokenExtractor, async (request, response) => {
     try {
         const user = await User.findOne({
             where: { id: request.params.id },
@@ -86,7 +94,7 @@ router.get('/:id', async (request, response) => {
 });
 
 
-router.put('/:userId', async (request, response) => {
+router.put('/:userId', tokenExtractor, checkPermissions(['editUserInTeam']), async (request, response) => {
     const { name, surname, email, password, phone, admin, disabled } = request.body
     const userId = request.params.userId;
 

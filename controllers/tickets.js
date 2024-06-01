@@ -2,8 +2,9 @@ const router = require('express').Router()
 const { sequelize } = require('../util/db')
 const { Op } = require('sequelize')
 
-const { Ticket, Project, Employee, User, Priority, Status, Type, Ticket_History, Employee_Project, User_Ticket } = require('../models')
+const { Ticket, User, Ticket_History, User_Ticket } = require('../models')
 const { tokenExtractor } = require('../util/middleware')
+const { getPermissions } = require('../util/getPermissions')
 
 router.get('/', tokenExtractor, async (request, response, next) => {
     try {
@@ -96,6 +97,13 @@ router.get('/', tokenExtractor, async (request, response, next) => {
 
 router.post('/', tokenExtractor, async (request, response) => {
 
+    const hasPermission = await getPermissions(request.decodedToken.id, ['assignUser'])
+    if (!hasPermission && request.body.assigned) {
+        return response.status(403).json({
+            error: 'Forbidden'
+        })
+    }
+
     try {
         const user = await User.findByPk(request.decodedToken.id)
         
@@ -159,6 +167,12 @@ router.get('/:id', async (request, response) => {
 router.put('/:ticketId', tokenExtractor, async (request, response) => {
     const ticketId = request.params.ticketId;
     const user = await User.findByPk(request.decodedToken.id)
+    const hasPermission = await getPermissions(request.decodedToken.id, ['assignUser'])
+    if (!hasPermission && request.body.assigned) {
+        return response.status(403).json({
+            error: 'Forbidden'
+        })
+    }
     try {
         if (request.body.assigned && user.access_id === 5) {
             return response.status(403).message("Only employees can assign a developer.")

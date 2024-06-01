@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const { sequelize } = require('../util/db')
-const { User, Employee, Project, Employee_Project, Ticket, Ticket_History, Status, User_Ticket, Team, Employment_History, Organization_Team } = require('../models')
-const { tokenExtractor } = require('../util/middleware')
+const { User, Employee, Project, Employee_Project, Ticket, Ticket_History, Status, User_Ticket } = require('../models')
+const { tokenExtractor, checkPermissions } = require('../util/middleware')
 
 router.get('/', tokenExtractor, async (request, response) => {
     const user = await User.findOne({
@@ -191,7 +191,7 @@ router.get('/:id', async (request, response) => {
     // TODO: move to seperate endpoints
 });
 
-router.post('/', tokenExtractor, async (request, response) => {
+router.post('/', tokenExtractor, checkPermissions(['createProject']), async (request, response) => {
 
     try {
         const project = await Project.create({ name: request.body.name, description: request.body.description })
@@ -219,29 +219,29 @@ router.put('/:projectId', tokenExtractor, async (request, response) => {
 
     try {
         const user = await User.findByPk(request.decodedToken.id)
-            const project = await Project.findByPk(projectId);
-            if (!project) {
-                return response.status(404).json({ error: 'Project not found' });
+        const project = await Project.findByPk(projectId);
+        if (!project) {
+            return response.status(404).json({ error: 'Project not found' });
+        }
+
+        project.name = request.body.name ?? project.name;
+        project.description = request.body.description ?? project.description;
+
+        const currentEmployees = await Employee_Project.findAll({
+            where: { projectId: projectId }
+        });
+
+        console.log("currentemployees")
+        console.log(currentEmployees)
+
+        const incomingEmployeeIds = new Set(request.body.employees.map(emp => emp.id));
+
+        for (const currentEmployee of currentEmployees) {
+            if (!incomingEmployeeIds.has(currentEmployee.employeeId) && !currentEmployee.to) {
+                currentEmployee.to = new Date();
+                await currentEmployee.save();
             }
-
-            project.name = request.body.name ?? project.name;
-            project.description = request.body.description ?? project.description;
-
-            const currentEmployees = await Employee_Project.findAll({
-                where: { projectId: projectId }
-            });
-
-            console.log("currentemployees")
-            console.log(currentEmployees)
-
-            const incomingEmployeeIds = new Set(request.body.employees.map(emp => emp.id));
-
-            for (const currentEmployee of currentEmployees) {
-                if (!incomingEmployeeIds.has(currentEmployee.employeeId) && !currentEmployee.to) {
-                    currentEmployee.to = new Date();
-                    await currentEmployee.save();
-                }
-            }
+        }
 
         for (const employee of request.body.employees) {
             const activeEmployee = currentEmployees.find(ep => ep.employeeId === employee.id && !ep.to);
@@ -273,8 +273,8 @@ router.put('/:projectId', tokenExtractor, async (request, response) => {
             }
         }
 
-            await project.save();
-            response.json(project);
+        await project.save();
+        response.json(project);
     } catch (error) {
         console.log(error);
         response.status(500).json({ error: 'Internal server error' });
