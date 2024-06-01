@@ -22,20 +22,29 @@ jobs:
           https://api.github.com/repos/Path-Finder-00/taskly-frontend/dispatches \
           -d '{"event_type":"run-workflow"}'
 
+      - name: Get Frontend Workflow Run ID
+        id: get_run_id
+        run: |
+          run_id=$(curl -s -H "Authorization: token ${{ secrets.TASKLY_FRONTEND_TOKEN }}" \
+          "https://api.github.com/repos/Path-Finder-00/taskly-frontend/actions/runs?event=repository_dispatch&per_page=1" \
+          | jq -r '.workflow_runs[0].id')
+          echo "::set-output name=run_id::$run_id"
+
       - name: Wait for Frontend Workflow Completion
         id: wait
         run: |
-          repo="Path-Finder-00/taskly-frontend"
-          workflow_id="run-workflow"  # replace with your workflow id
+          run_id=${{ steps.get_run_id.outputs.run_id }}
           status="in_progress"
+          conclusion="null"
           while [[ "$status" == "in_progress" || "$status" == "queued" ]]; do
             sleep 30
-            status=$(curl -s -H "Authorization: token ${{ secrets.TASKLY_FRONTEND_TOKEN }}" \
-            "https://api.github.com/repos/$repo/actions/runs?event=repository_dispatch" \
-            | jq -r '.workflow_runs[] | select(.name=="run-workflow") | .status')
-            echo "Current status: $status"
+            response=$(curl -s -H "Authorization: token ${{ secrets.TASKLY_FRONTEND_TOKEN }}" \
+            "https://api.github.com/repos/Path-Finder-00/taskly-frontend/actions/runs/$run_id")
+            status=$(echo $response | jq -r '.status')
+            conclusion=$(echo $response | jq -r '.conclusion')
+            echo "Current status: $status, conclusion: $conclusion"
           done
-          if [[ "$status" != "completed" ]]; then
+          if [[ "$conclusion" != "success" ]]; then
             echo "Workflow did not complete successfully"
             exit 1
           fi
