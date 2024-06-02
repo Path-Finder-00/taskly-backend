@@ -72,8 +72,8 @@ jobs:
     needs: trigger_frontend_workflow
     concurrency: deploy-group
     steps:
-      - run: ls -R
       - uses: actions/checkout@v4
+      - run: ls -R
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: npm install
       - run: flyctl deploy --remote-only
