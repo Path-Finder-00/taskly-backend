@@ -28,6 +28,7 @@ const employeeProjectsRouter = require('./controllers/employee_projects')
 const commentsRouter = require('./controllers/comments')
 const attachmentsRouter = require('./controllers/attachments')
 const permissionsRouter = require('./controllers/permissions')
+const logoutRouter = require('./controllers/logout')
 
 app.use(express.json())
 app.use(cors())
@@ -67,6 +68,7 @@ app.use('/api/employee_projects', employeeProjectsRouter)
 app.use('/api/comments', commentsRouter)
 app.use('/api/attachments', attachmentsRouter)
 app.use('/api/permissions', permissionsRouter)
+app.use('/api/logout', logoutRouter)
 
 app.use(middleware.errorHandler)
 
