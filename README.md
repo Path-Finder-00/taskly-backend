@@ -22,3 +22,10 @@ Interfejs jest napisany w środowisku uruchomieniowym **Node.js**, przy użyciu 
 ### Hosting
 
 Aplikacja również jest hostowana na platformie [fly.io](https://fly.io/) i jest dostępna pod adresem https://taskly-backend.fly.dev/.
+
+## Instalacja
+
+Aby uruchomić aplikację lokalnie należy:
+
+1. Pobrać Node.js: [Pobierz Node.js](https://nodejs.org/en/download/prebuilt-installer)
+2. 
