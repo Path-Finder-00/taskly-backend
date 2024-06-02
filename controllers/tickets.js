@@ -165,7 +165,12 @@ router.get('/allTicketsInTeam', tokenExtractor, checkPermissions(['seeAllTickets
             }
         })
 
-        team_id = employment_history.teamId
+        if (employment_history?.teamId){
+            team_id = employment_history.teamId
+        } else {
+            return response.json([])
+        }
+
 
         const sql = `
         SELECT DISTINCT pr.id, pr.name, pr.description
@@ -334,7 +339,7 @@ router.put('/:ticketId', tokenExtractor, async (request, response) => {
 
         const ticket_history = await Ticket_History.create({
             employeeId: request.body.assigned,
-            statusId: request.body.assigned ? 2 : 1,
+            statusId: request.body.status,
             priorityId: request.body.priority,
             ticketId: ticket.id,
             since: request.body.assigned ? new Date() : null

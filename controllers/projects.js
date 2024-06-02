@@ -2,6 +2,7 @@ const router = require('express').Router()
 const { sequelize } = require('../util/db')
 const { User, Employee, Project, Employee_Project, Ticket, Ticket_History, Status, User_Ticket, Employment_History } = require('../models')
 const { tokenExtractor, checkPermissions } = require('../util/middleware')
+const { getPermissions } = require('../util/getPermissions')
 
 router.get('/', tokenExtractor, async (request, response) => {
     const user = await User.findOne({
@@ -99,28 +100,28 @@ router.get('/availableProjectsByTeamId/', tokenExtractor, checkPermissions(["see
         `;
 
         const data = await sequelize.query(sql, { type: sequelize.QueryTypes.SELECT });
-        const projects = data.map(project => ({
-            project: {
-                id: project.id,
-                name: project.name,
-                description: project.description
-            }
-        }));
-        response.json(projects);
+        response.json(data);
     } catch (error) {
         console.error('Error fetching projects:', error);
         response.status(500).send('Internal Server Error');
     }
 })
 
-router.get('/availableProjectsByOrganizationId/', tokenExtractor, checkPermissions(['seeAllProjects']), async (request, response) => {
+router.get('/availableProjectsByOrganizationId/', tokenExtractor, async (request, response) => {
     try {
         const user = await User.findOne({
             where: {
                 id: request.decodedToken.id
             },
         })
-        console.log(user)
+
+        const hasPermission = await getPermissions(request.decodedToken.id, ['seeAllProjects'])
+        if (!hasPermission && user.accessId !== 5) {
+            return response.status(403).json({
+                error: 'Forbidden'
+            })
+        }
+        
         const orgId = user.organizationId;
 
         const sql = `
@@ -134,15 +135,8 @@ router.get('/availableProjectsByOrganizationId/', tokenExtractor, checkPermissio
             WHERE org.id = ${orgId}; 
         `;
 
-        const data = await sequelize.query(sql, { type: sequelize.QueryTypes.SELECT });
-        const projects = data.map(project => ({
-            project: {
-                id: project.id,
-                name: project.name,
-                description: project.description
-            }
-        }));
-        response.json(projects);
+        const data = await sequelize.query(sql, { type: sequelize.QueryTypes.SELECT });        
+        response.json(data);
     } catch (error) {
         console.error('Error fetching projects:', error);
         response.status(500).send('Internal Server Error');
