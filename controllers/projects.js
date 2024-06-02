@@ -107,7 +107,6 @@ router.get('/availableProjectsByTeamId/', tokenExtractor, checkPermissions(["see
             }
         }));
         response.json(projects);
-        response.json(data);
     } catch (error) {
         console.error('Error fetching projects:', error);
         response.status(500).send('Internal Server Error');
@@ -144,7 +143,6 @@ router.get('/availableProjectsByOrganizationId/', tokenExtractor, checkPermissio
             }
         }));
         response.json(projects);
-        response.json(data);
     } catch (error) {
         console.error('Error fetching projects:', error);
         response.status(500).send('Internal Server Error');
