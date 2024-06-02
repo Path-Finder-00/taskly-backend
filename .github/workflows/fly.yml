@@ -60,7 +60,8 @@ jobs:
           "https://api.github.com/repos/Path-Finder-00/taskly-frontend/actions/runs/$run_id/artifacts" \
           | jq -r '.artifacts[0].archive_download_url')
           curl -L -H "Authorization: token ${{ secrets.TASKLY_FRONTEND_TOKEN }}" $artifacts_url --output dist.zip
-          unzip -d ./ dist.zip
+          unzip dist.zip
+          rm dist.zip
 
       - name: List files
         run: ls -R
