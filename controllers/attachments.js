@@ -47,7 +47,7 @@ router.post('/:id', tokenExtractor, async (request, response) => {
 
     try {
 
-        const mnt = "data"
+        const mnt = "/data"
         const dir = request.params.id
 
         const storage = multer.diskStorage({

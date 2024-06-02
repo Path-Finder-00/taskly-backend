@@ -9,7 +9,7 @@ content-type: application/json
     "phone": "+48111111111",
     "admin": true,
     "technologies": [],
-    "team": null,
+    "team": 1,
     "project": "",
     "team_lead": false,
     "role": "",
