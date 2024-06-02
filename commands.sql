@@ -54,5 +54,5 @@ INSERT INTO access_permissions ("access_id", "permission_id") VALUES (4, 7);
 
 --- Drop database
 
---TRUNCATE TABLE accesses, attachments, client_projects, clients, comments, employee_projects, employee_technologies, employees, employment_histories, migrations, organizations, priorities, projects, roles, sessions, statuses, teams, technologies, ticket_histories, tickets, types, user_tickets, users CASCADE;
---DROP TABLE accesses, attachments, client_projects, clients, comments, employee_projects, employee_technologies, employees, employment_histories, migrations, organizations, priorities, projects, roles, sessions, statuses, teams, technologies, ticket_histories, tickets, types, user_tickets, users;
+TRUNCATE TABLE access_permissions, accesses, attachments, comments, employee_projects, employee_technologies, employees, employment_histories, migrations, organizations, permissions, priorities, projects, roles, sessions, statuses, teams, technologies, ticket_histories, tickets, types, user_tickets, users CASCADE;
+DROP TABLE access_permissions, accesses, attachments, comments, employee_projects, employee_technologies, employees, employment_histories, migrations, organizations, permissions, priorities, projects, roles, sessions, statuses, teams, technologies, ticket_histories, tickets, types, user_tickets, users;

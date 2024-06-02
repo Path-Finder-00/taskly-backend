@@ -35,7 +35,6 @@ User.init({
     phone: {
         type: DataTypes.STRING(255),
         allowNull: false,
-        // TODO: shall we consider country codes? e.g. 123456789, +1123456789, +12123456789, +123123456789, +1234123456789 are valid; 1234567890 is not valid
         validate: {
             isPhoneNumber(phoneNumber) {
                 const phoneNumberPattern = /^(?:\+\d{1,4}[0-9]{0,9}|\d{9})$/;

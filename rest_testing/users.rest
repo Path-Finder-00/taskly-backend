@@ -1,13 +1,12 @@
 POST http://localhost:3001/api/users HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImlkIjoxLCJpYXQiOjE3MTczNTE3OTR9.nFRmDPHduPtXKNj42wiE2LrvieVAhfk6fK1w7sDMGIA
 
 {
     "name": "Admin",
-    "surname": "2.Org",
-    "email": "admin_2@gmail.com",
+    "surname": "Testowy",
+    "email": "admin@gmail.com",
     "password": "password",
-    "phone": "+48666666666",
+    "phone": "+48111111111",
     "admin": true,
     "technologies": [],
     "team": null,
@@ -15,5 +14,5 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQ
     "team_lead": false,
     "role": "",
     "is_client": false,
-    "organization": 2
+    "organization": 1
 }
