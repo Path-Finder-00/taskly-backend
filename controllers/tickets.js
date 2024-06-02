@@ -2,8 +2,8 @@ const router = require('express').Router()
 const { sequelize } = require('../util/db')
 const { Op } = require('sequelize')
 
-const { Ticket, User, Ticket_History, User_Ticket } = require('../models')
-const { tokenExtractor } = require('../util/middleware')
+const { Ticket, User, Ticket_History, User_Ticket, Project, Employee_Project, Employee, Employment_History, Team, Type, Status, Priority } = require('../models')
+const { tokenExtractor, checkPermissions } = require('../util/middleware')
 const { getPermissions } = require('../util/getPermissions')
 
 router.get('/', tokenExtractor, async (request, response, next) => {
@@ -95,6 +95,142 @@ router.get('/', tokenExtractor, async (request, response, next) => {
     }
 })
 
+router.get('/allTickets', tokenExtractor, checkPermissions(['seeAllTickets']), async (request, response, next) => {
+    try {
+        const user = await User.findByPk(request.decodedToken.id)
+        sequelize.query(`
+            SELECT 
+                "tickets"."id", 
+                "users"."name", 
+                "users"."surname", 
+                "projects"."name" AS "projectName",
+                "tickets"."title", 
+                "tickets"."created_at" AS "createdAt",  
+                "types"."type", 
+                "statuses"."status", 
+                "priorities"."priority"
+            FROM 
+                "tickets"
+            JOIN 
+                "projects" ON "tickets"."project_id" = "projects"."id"
+            JOIN 
+                "types" ON "tickets"."type_id" = "types"."id"
+            LEFT JOIN 
+                "ticket_histories" ON "tickets"."id" = "ticket_histories"."ticket_id"
+            LEFT JOIN 
+                "statuses" ON "ticket_histories"."status_id" = "statuses"."id"
+            LEFT JOIN 
+                "priorities" ON "ticket_histories"."priority_id" = "priorities"."id"
+            LEFT JOIN 
+                "employees" ON "ticket_histories"."employee_id" = "employees"."id"
+            LEFT JOIN 
+                "users" ON "employees"."user_id" = "users"."id"
+            LEFT JOIN 
+                "organizations" ON "users"."organization_id" = "organizations"."id"
+            WHERE 
+                ("organizations"."id" = (
+                    SELECT "organization_id"
+                    FROM "users"
+                    WHERE "id" = :userId
+                ) OR "users"."id" IS NULL)
+            AND 
+                ("ticket_histories"."id" IS NULL OR "ticket_histories"."id" IN (
+                    SELECT find_last_edit.last_edit
+                    FROM (
+                        SELECT ticket_id, MAX(id) AS last_edit
+                        FROM ticket_histories
+                        GROUP BY ticket_id
+            ) find_last_edit ))
+            `, {
+            type: sequelize.QueryTypes.SELECT,
+            replacements: { userId: request.decodedToken.id },
+        }).then(tickets => {
+            response.json(tickets)
+        })
+    } catch (error) {
+        console.log(error)
+        next(error)
+    }
+})
+
+router.get('/allTicketsInTeam', tokenExtractor, checkPermissions(['seeAllTicketsInTeam']), async (request, response, next) => {
+    try {
+        const user = await User.findByPk(request.decodedToken.id)
+        
+        const employment_history = await Employment_History.findOne({
+            where: {to: null},
+            include: {
+                model: Employee,
+                where: {id: request.decodedToken.id}
+            }
+        })
+
+        team_id = employment_history.teamId
+
+        const sql = `
+        SELECT DISTINCT pr.id, pr.name, pr.description
+            FROM teams t
+            JOIN employment_histories eh ON t.id = eh.team_id 
+            JOIN employees e ON eh.employee_id = e.id
+            JOIN employee_projects pp ON e.id = pp.employee_id
+            JOIN projects pr ON pp.project_id = pr.id
+            WHERE t.id = ${team_id} and eh.to IS NULL;
+        `;
+
+        const projectsInTeam = await sequelize.query(sql, { type: sequelize.QueryTypes.SELECT });
+
+        const projectInTeamIds = projectsInTeam.map(project => project.id)
+
+        sequelize.query(`
+            SELECT 
+                "tickets"."id", 
+                "users"."name", 
+                "users"."surname", 
+                "projects"."name" AS "projectName",
+                "tickets"."title", 
+                "tickets"."created_at" AS "createdAt",  
+                "types"."type", 
+                "statuses"."status", 
+                "priorities"."priority"
+            FROM 
+                "tickets"
+            JOIN 
+                "projects" ON "tickets"."project_id" = "projects"."id"
+            JOIN 
+                "types" ON "tickets"."type_id" = "types"."id"
+            LEFT JOIN 
+                "ticket_histories" ON "tickets"."id" = "ticket_histories"."ticket_id"
+            LEFT JOIN 
+                "statuses" ON "ticket_histories"."status_id" = "statuses"."id"
+            LEFT JOIN 
+                "priorities" ON "ticket_histories"."priority_id" = "priorities"."id"
+            LEFT JOIN 
+                "employees" ON "ticket_histories"."employee_id" = "employees"."id"
+            LEFT JOIN 
+                "users" ON "employees"."user_id" = "users"."id"
+            WHERE 
+                "projects"."id" = ANY(ARRAY[:projectIds]::integer[])
+            AND 
+                ("ticket_histories"."id" IS NULL OR "ticket_histories"."id" IN (
+                    SELECT find_last_edit.last_edit
+                    FROM (
+                        SELECT ticket_id, MAX(id) AS last_edit
+                        FROM ticket_histories
+                        GROUP BY ticket_id
+            ) find_last_edit ))
+            `, {
+            type: sequelize.QueryTypes.SELECT,
+            replacements: { projectIds: projectInTeamIds },
+        }).then(tickets => {
+            response.json(tickets)
+        })
+    
+    } catch (error) {
+        console.log(error)
+        next(error)
+    }
+})
+
 router.post('/', tokenExtractor, async (request, response) => {
 
     const hasPermission = await getPermissions(request.decodedToken.id, ['assignUser'])
@@ -106,7 +242,7 @@ router.post('/', tokenExtractor, async (request, response) => {
 
     try {
         const user = await User.findByPk(request.decodedToken.id)
-        
+
         const ticket = await Ticket.create({
             title: request.body.title,
             description: request.body.description,
@@ -146,7 +282,7 @@ router.get('/:id', async (request, response) => {
                         model: User,
                         attributes: ['name', 'surname']
                     }
-                }, 
+                },
                 {
                     model: Ticket_History,
                 }
@@ -181,12 +317,12 @@ router.put('/:ticketId', tokenExtractor, async (request, response) => {
         if (!ticket) {
             return response.status(404).json({ error: 'Ticket not found' });
         }
-        
+
         ticket.title = request.body.title ?? ticket.title;
         ticket.description = request.body.description ?? ticket.description;
         ticket.projectId = request.body.project ?? ticket.projectId;
         ticket.typeId = request.body.type ?? ticket.typeId;
-        
+
         const lastHistory = await Ticket_History.findOne({
             where: { ticket_id: ticketId },
             order: [['createdAt', 'DESC']]

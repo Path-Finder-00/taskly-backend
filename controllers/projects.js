@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const { sequelize } = require('../util/db')
-const { User, Employee, Project, Employee_Project, Ticket, Ticket_History, Status, User_Ticket } = require('../models')
+const { User, Employee, Project, Employee_Project, Ticket, Ticket_History, Status, User_Ticket, Employment_History } = require('../models')
 const { tokenExtractor, checkPermissions } = require('../util/middleware')
 
 router.get('/', tokenExtractor, async (request, response) => {
@@ -14,8 +14,8 @@ router.get('/', tokenExtractor, async (request, response) => {
                 include: [{
                     model: Project,
                     through: {
-                        model: Employee_Project
-                        // where: { to: null }
+                        model: Employee_Project,
+                        where: { to: null }
                     }
                 }]
             }
@@ -36,7 +36,7 @@ router.get('/user/:id', async (request, response) => {
                 include: [{
                     model: Project,
                     through: {
-                        model: Employee_Project
+                        model: Employee_Project,
                         // where: { to: null }
                     }
                 }]
@@ -56,6 +56,7 @@ router.get('/projectsWithRoles', tokenExtractor, async (request, response) => {
             model: Employee,
             include: {
                 model: Employee_Project,
+                where: { to: null },
                 include: {
                     model: Project
                 }
@@ -65,61 +66,66 @@ router.get('/projectsWithRoles', tokenExtractor, async (request, response) => {
 
     console.log(user)
 
-    const projectsWithRoles = user.employee.employee_projects.map(project => ({ role: project.roleId, project: project.project }))
+    const projectsWithRoles = user.employee?.employee_projects.map(project => ({ role: project.roleId, project: project.project }))
 
     response.json(projectsWithRoles)
 })
 
-router.get('/availableProjectsByTeamId/:id', async (request, response) => {
+router.get('/availableProjectsByTeamId/', tokenExtractor, checkPermissions(["seeAllProjectsInTeam"]), async (request, response) => {
     try {
-        const teamId = request.params.id;
-        // const projects = await Team.findAll({
-        //     where: { id: teamId },
-        //     include: [{
-        //         model: Employment_History,
-        //         include: [{
-        //             model: Employee,
-        //             include: [{
-        //                 model: Employee_Project,
-        //                 include: [{
-        //                     model: Project,
-        //                     attributes: ['name', 'id'],
-        //                     distinct: true
-        //                 }],
-        //                 attributes: []
-        //             }],
-        //             attributes: []
-        //         }],
-        //         attributes: []
-        //     }],
-        //     attributes: [],
-        //     distinct: true,
-        //     group: ['team.id','employment_histories.employee.employee_projects.project.name','employment_histories.employee.employee_projects.project.id']
-        // });
+        const user = await User.findOne({
+            where: {
+                id: request.decodedToken.id
+            },
+            include: {
+                model: Employee,
+                include: {
+                    model: Employment_History,
+                    where: {to: null}
+                }
+            }
+        })
+
+        const teamId = user.employee.employment_histories[0].teamId;
 
         const sql = `
-        SELECT DISTINCT pr.id, pr.name 
-            FROM teams t JOIN employment_histories eh ON t.id = eh.team_id
+        SELECT DISTINCT pr.id, pr.name, pr.description
+            FROM teams t
+            JOIN employment_histories eh ON t.id = eh.team_id 
             JOIN employees e ON eh.employee_id = e.id
             JOIN employee_projects pp ON e.id = pp.employee_id
             JOIN projects pr ON pp.project_id = pr.id
-            WHERE t.id = ${teamId};
+            WHERE t.id = ${teamId} and eh.to IS NULL;
         `;
 
-        const projects = await sequelize.query(sql, { type: sequelize.QueryTypes.SELECT });
+        const data = await sequelize.query(sql, { type: sequelize.QueryTypes.SELECT });
+        const projects = data.map(project => ({
+            project: {
+                id: project.id,
+                name: project.name,
+                description: project.description
+            }
+        }));
         response.json(projects);
+        response.json(data);
     } catch (error) {
         console.error('Error fetching projects:', error);
         response.status(500).send('Internal Server Error');
     }
 })
 
-router.get('/availableProjectsByOrganizationId/:id', async (request, response) => {
+router.get('/availableProjectsByOrganizationId/', tokenExtractor, checkPermissions(['seeAllProjects']), async (request, response) => {
     try {
-        const orgId = request.params.id;
+        const user = await User.findOne({
+            where: {
+                id: request.decodedToken.id
+            },
+        })
+        console.log(user)
+        const orgId = user.organizationId;
 
         const sql = `
-        SELECT DISTINCT pr.id, pr.name
+        SELECT DISTINCT pr.id, pr.name, pr.description
             FROM organizations org
             JOIN teams t ON org.id = t.organization_id
             JOIN employment_histories eh ON t.id = eh.team_id
@@ -129,8 +135,16 @@ router.get('/availableProjectsByOrganizationId/:id', async (request, response) =
             WHERE org.id = ${orgId}; 
         `;
 
-        const projects = await sequelize.query(sql, { type: sequelize.QueryTypes.SELECT });
+        const data = await sequelize.query(sql, { type: sequelize.QueryTypes.SELECT });
+        const projects = data.map(project => ({
+            project: {
+                id: project.id,
+                name: project.name,
+                description: project.description
+            }
+        }));
         response.json(projects);
+        response.json(data);
     } catch (error) {
         console.error('Error fetching projects:', error);
         response.status(500).send('Internal Server Error');
