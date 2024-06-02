@@ -37,7 +37,7 @@ router.get('/all/:id', tokenExtractor, async (request, response) => {
 
 router.get('/:id/:name', tokenExtractor, async (request, response) => {
 
-    const file = path.join("data", request.params.id, request.params.name)
+    const file = path.join("/data", request.params.id, request.params.name)
 
     response.download(file)
 })
