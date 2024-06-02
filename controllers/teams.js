@@ -35,7 +35,8 @@ router.get('/members', tokenExtractor, async (request, response, next) => {
                                         )
                                         AND employment_histories.to IS NULL
                                     )`)
-                                }
+                                },
+                                to: null
                             }
                         }
                     ]
