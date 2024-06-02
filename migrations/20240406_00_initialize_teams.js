@@ -11,12 +11,6 @@ module.exports = {
             name: {
                 type: DataTypes.STRING(50),
                 allowNull: false
-            },
-            created_at: {
-                type: DataTypes.DATE
-            },
-            updated_at: {
-                type: DataTypes.DATE
             }
         })
     },
