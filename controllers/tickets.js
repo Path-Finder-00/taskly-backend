@@ -2,7 +2,7 @@ const router = require('express').Router()
 const { sequelize } = require('../util/db')
 const { Op } = require('sequelize')
 
-const { Ticket, User, Ticket_History, User_Ticket, Project, Employee_Project, Employee, Employment_History, Team, Type, Status, Priority } = require('../models')
+const { Ticket, User, Ticket_History, User_Ticket, Employee, Employment_History, Organization } = require('../models')
 const { tokenExtractor, checkPermissions } = require('../util/middleware')
 const { getPermissions } = require('../util/getPermissions')
 
@@ -43,6 +43,7 @@ router.get('/', tokenExtractor, async (request, response, next) => {
                             GROUP BY ticket_id
                         ) find_last_edit
                     )
+                ORDER BY "createdAt"
             `, {
                 type: sequelize.QueryTypes.SELECT,
                 replacements: { userId: request.decodedToken.id },
@@ -82,6 +83,7 @@ router.get('/', tokenExtractor, async (request, response, next) => {
                         GROUP BY ticket_id
                     ) find_last_edit
                 )
+                ORDER BY "createdAt"
             `, {
                 type: sequelize.QueryTypes.SELECT,
                 replacements: { userId: request.decodedToken.id },
@@ -98,52 +100,46 @@ router.get('/', tokenExtractor, async (request, response, next) => {
 router.get('/allTickets', tokenExtractor, checkPermissions(['seeAllTickets']), async (request, response, next) => {
     try {
         const user = await User.findByPk(request.decodedToken.id)
+
         sequelize.query(`
-            SELECT 
-                "tickets"."id", 
-                "users"."name", 
-                "users"."surname", 
-                "projects"."name" AS "projectName",
-                "tickets"."title", 
-                "tickets"."created_at" AS "createdAt",  
-                "types"."type", 
-                "statuses"."status", 
-                "priorities"."priority"
-            FROM 
-                "tickets"
-            JOIN 
-                "projects" ON "tickets"."project_id" = "projects"."id"
-            JOIN 
-                "types" ON "tickets"."type_id" = "types"."id"
-            LEFT JOIN 
-                "ticket_histories" ON "tickets"."id" = "ticket_histories"."ticket_id"
-            LEFT JOIN 
-                "statuses" ON "ticket_histories"."status_id" = "statuses"."id"
-            LEFT JOIN 
-                "priorities" ON "ticket_histories"."priority_id" = "priorities"."id"
-            LEFT JOIN 
-                "employees" ON "ticket_histories"."employee_id" = "employees"."id"
-            LEFT JOIN 
-                "users" ON "employees"."user_id" = "users"."id"
-            LEFT JOIN 
-                "organizations" ON "users"."organization_id" = "organizations"."id"
-            WHERE 
-                ("organizations"."id" = (
-                    SELECT "organization_id"
-                    FROM "users"
-                    WHERE "id" = :userId
-                ) OR "users"."id" IS NULL)
-            AND 
-                ("ticket_histories"."id" IS NULL OR "ticket_histories"."id" IN (
-                    SELECT find_last_edit.last_edit
-                    FROM (
-                        SELECT ticket_id, MAX(id) AS last_edit
-                        FROM ticket_histories
-                        GROUP BY ticket_id
-            ) find_last_edit ))
-            `, {
+        SELECT DISTINCT "tickets"."id", 
+            "users"."name", 
+            "users"."surname", 
+            "projects"."name" AS "projectName",
+            "tickets"."title" AS "title", 
+            "tickets"."created_at" AS "createdAt",  
+            "types"."type" AS "type", 
+            "statuses"."status" AS "status", 
+            "priorities"."priority" AS "priority"
+        FROM "organizations"
+        JOIN "users"
+            ON "organizations"."id" = "users"."organization_id"
+        JOIN "user_tickets"
+            ON "users"."id" = "user_tickets"."user_id"
+        JOIN "tickets"
+            ON "user_tickets"."ticket_id" = "tickets"."id"
+        JOIN "projects"
+            ON "tickets"."project_id" = "projects"."id"
+        JOIN "ticket_histories"
+            ON "tickets"."id" = "ticket_histories"."ticket_id"
+        JOIN "priorities"
+            ON "priorities"."id" = "ticket_histories"."priority_id"
+        JOIN "statuses"
+            ON "statuses"."id" = "ticket_histories"."status_id"
+        JOIN "types"
+            ON "types"."id" = "tickets"."type_id"
+        WHERE "organizations"."id" = :organizationId
+        AND "ticket_histories"."id" IN (
+                SELECT find_last_edit.last_edit
+                FROM ( SELECT ticket_id, MAX(id) AS last_edit
+                FROM ticket_histories
+                GROUP BY ticket_id
+            ) find_last_edit
+        )
+        ORDER BY "createdAt"
+        `, {
             type: sequelize.QueryTypes.SELECT,
-            replacements: { userId: request.decodedToken.id },
+            replacements: { organizationId: user.organizationId },
         }).then(tickets => {
             response.json(tickets)
         })
@@ -218,6 +214,7 @@ router.get('/allTicketsInTeam', tokenExtractor, checkPermissions(['seeAllTickets
                         FROM ticket_histories
                         GROUP BY ticket_id
             ) find_last_edit ))
+            ORDER BY "createdAt"
             `, {
             type: sequelize.QueryTypes.SELECT,
             replacements: { projectIds: projectInTeamIds },

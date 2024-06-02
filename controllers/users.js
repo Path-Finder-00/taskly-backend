@@ -114,24 +114,26 @@ router.put('/:userId', tokenExtractor, async (request, response) => {
             return response.status(404).json({ error: 'User not found' })
         }
 
-        if (password.length < 8) {
+        if (password.length > 0 && password.length < 8) {
             return response.status(400).json({
                 error: 'Password has to be at least 8 characters long'
             })
         }
 
-        const emailExists = await User.findOne({
-            where: { email: email }
-        });
+        if (user.email !== email) {
+            const emailExists = await User.findOne({
+                where: { email: email }
+            });
 
-        if (emailExists) {
-            return response.status(409).json({
-                error: 'Email exists'
-            })
+            if (emailExists) {
+                return response.status(409).json({
+                    error: 'Email exists'
+                })
+            }
         }
 
         const saltRounds = 10
-        const passwordHash = await bcrypt.hash(password, saltRounds)
+        const passwordHash = password.length > 0 ? await bcrypt.hash(password, saltRounds) : null
 
         const updatedUser = {
             name: name ?? user.name,

@@ -34,11 +34,11 @@ app.use(cors())
 
 app.use(expressCspHeader({
   directives: {
-    'default-src': [SELF, 'http://localhost:3001'],
-    'img-src': [SELF, 'http://localhost:3001'],
+    'default-src': [SELF],
+    'img-src': [SELF],
     'script-src': [SELF, INLINE],
     'style-src': [SELF, INLINE],
-    'connect-src': [SELF, 'http://localhost:3001'],
+    'connect-src': [SELF],
     'font-src': [SELF],
     'object-src': [NONE],
     'media-src': [SELF],

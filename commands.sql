@@ -49,8 +49,6 @@ INSERT INTO permissions ("name") values ('seeAllUsers'), ('editAnyUser'), ('edit
 INSERT INTO access_permissions ("access_id", "permission_id") VALUES (1, 1), (1, 2), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10), (1, 11), (1, 12), (1, 13);
 --- Team lead permissions
 INSERT INTO access_permissions ("access_id", "permission_id") VALUES (2, 1), (2, 3), (2, 5), (2, 7), (2, 8), (2, 9), (2, 11), (2, 13);
---- Manager permissions
-INSERT INTO access_permissions ("access_id", "permission_id") VALUES (3, 7), (3, 9);
 --- Employee permissions
 INSERT INTO access_permissions ("access_id", "permission_id") VALUES (4, 7);
 
