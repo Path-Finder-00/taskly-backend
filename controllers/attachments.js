@@ -37,7 +37,7 @@ router.get('/all/:id', tokenExtractor, async (request, response) => {
 
 router.get('/:id/:name', tokenExtractor, async (request, response) => {
 
-    const file = path.join("data", request.params.id, request.params.name)
+    const file = path.join("/data", request.params.id, request.params.name)
 
     response.download(file)
 })
@@ -47,7 +47,7 @@ router.post('/:id', tokenExtractor, async (request, response) => {
 
     try {
 
-        const mnt = "data"
+        const mnt = "/data"
         const dir = request.params.id
 
         const storage = multer.diskStorage({

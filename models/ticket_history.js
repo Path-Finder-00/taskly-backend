@@ -42,7 +42,6 @@ Ticket_History.init({
     sequelize,
     underscored: true,
     timestamps: true,
-    updatedAt: false,
     modelName: 'ticket_history'
 })
 

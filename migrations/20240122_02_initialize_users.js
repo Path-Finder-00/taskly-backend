@@ -30,7 +30,6 @@ module.exports = {
                 type: DataTypes.TEXT,
                 allowNull: false
             },
-            // TODO - write a validator for checking wheter it is a proper phone number
             phone: {
                 type: DataTypes.STRING,
                 allowNull: false

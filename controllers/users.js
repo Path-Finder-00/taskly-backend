@@ -5,7 +5,6 @@ const { tokenExtractor, checkPermissions } = require('../util/middleware')
 const { getPermissions } = require('../util/getPermissions')
 
 router.post('/', tokenExtractor, checkPermissions(['createUser']), async (request, response) => {
-    console.log(request.body)
     const { name, surname, email, password, phone, admin, technologies, team, project, team_lead, role, is_client, organization } = request.body
 
     if (password.length < 8) {
@@ -17,6 +16,16 @@ router.post('/', tokenExtractor, checkPermissions(['createUser']), async (reques
     if (!hasPermission && (admin || team_lead)) {
         return response.status(403).json({
             error: 'Forbidden'
+        })
+    }
+
+    const emailExists = await User.findOne({
+        where: { email: email }
+    });
+
+    if (emailExists) {
+        return response.status(409).json({
+            error: 'Email exists'
         })
     }
 
@@ -75,8 +84,7 @@ router.get('/:id', tokenExtractor, async (request, response) => {
             include: {
                 model: Employee,
                 include: {
-                    model: Technology,
-                    // attributes: ['technology']
+                    model: Technology
                 },
             },
             attributes: ['email', 'id', 'name', 'surname', 'phone', 'accessId']
@@ -94,8 +102,8 @@ router.get('/:id', tokenExtractor, async (request, response) => {
 });
 
 
-router.put('/:userId', tokenExtractor, checkPermissions(['editUserInTeam']), async (request, response) => {
-    const { name, surname, email, password, phone, admin, disabled } = request.body
+router.put('/:userId', tokenExtractor, async (request, response) => {
+    const { name, surname, email, password, phone, admin, disabled, team_lead, is_client } = request.body
     const userId = request.params.userId;
 
     try {
@@ -104,29 +112,64 @@ router.put('/:userId', tokenExtractor, checkPermissions(['editUserInTeam']), asy
             return response.status(404).json({ error: 'User not found' })
         }
 
-        if (password.length < 8) {
+        if (password.length > 0 && password.length < 8) {
             return response.status(400).json({
                 error: 'Password has to be at least 8 characters long'
             })
         }
 
+        if (user.email !== email) {
+            const emailExists = await User.findOne({
+                where: { email: email }
+            });
+
+            if (emailExists) {
+                return response.status(409).json({
+                    error: 'Email exists'
+                })
+            }
+        }
+
         const saltRounds = 10
-        const passwordHash = await bcrypt.hash(password, saltRounds)
+        const passwordHash = password.length > 0 ? await bcrypt.hash(password, saltRounds) : null
 
-        user.name = name ?? user.name
-        user.surname = surname ?? user.surname
-        user.email = email ?? user.email
-        user.passwordHash = passwordHash ?? user.passwordHash
-        user.phone = phone ?? user.phone
-        user.admin = admin ?? user.admin
-        user.disabled = disabled ?? user.disabled
+        const updatedUser = {
+            name: name ?? user.name,
+            surname: surname ?? user.surname,
+            email: email ?? user.email,
+            passwordHash: passwordHash ?? user.passwordHash,
+            phone: phone ?? user.phone,
+            accessId: admin ? 1 : team_lead ? 2 : is_client ? 5 : 4,
+            disabled: disabled ?? user.disabled
+        };
 
-        await user.save();
+        const hasEditUserInTeamPermission = await getPermissions(request.decodedToken.id, ['editUserInTeam'])
+        const hasEditAnyUserPermission = await getPermissions(request.decodedToken.id, ['editAnyUser'])
 
-        if (!request.body.is_client === true) {
-            const employee = await Employee.findOne({
-                where: { user_id: userId }
+        const employee = await Employee.findOne({
+            where: { user_id: userId }
+        })
+
+        if (!request.body.is_client) {
+            const employment_histories = await Employment_History.findAll({
+                where: { employee_id: employee.id }
             })
+
+            const current = employment_histories.find(eh => eh.to === null)
+
+            if (!hasEditUserInTeamPermission && (
+                updatedUser.name !== user.name ||
+                updatedUser.surname !== user.surname ||
+                updatedUser.email !== user.email ||
+                updatedUser.phone !== user.phone ||
+                updatedUser.accessId !== user.accessId ||
+                updatedUser.disabled !== user.disabled ||
+                request.body.team !== current.teamId
+            )) {
+                return response.status(403).json({
+                    error: 'Forbidden'
+                })
+            }
 
             const existingTechs = await Employee_Technology.findAll({
                 where: { employee_id: employee.id },
@@ -147,7 +190,7 @@ router.put('/:userId', tokenExtractor, checkPermissions(['editUserInTeam']), asy
                     technologyId: techsToRemove
                 }
             });
-
+            
             for (const techId of techsToAdd) {
                 await Employee_Technology.create({
                     employeeId: employee.id,
@@ -155,14 +198,8 @@ router.put('/:userId', tokenExtractor, checkPermissions(['editUserInTeam']), asy
                 });
             }
 
-            const employment_histories = await Employment_History.findAll({
-                where: { employee_id: employee.id }
-            })
-
-            const current = employment_histories.find(eh => eh.to === null)
-
             if (current) {
-                if (current.teamId !== request.body.team) {
+                if (current.teamId !== request.body.team) { // For employees with team
                     current.to = new Date();
                     await current.save();
 
@@ -171,15 +208,61 @@ router.put('/:userId', tokenExtractor, checkPermissions(['editUserInTeam']), asy
                         teamId: request.body.team,
                         since: new Date(),
                         to: null,
-                        team_lead: request.body.team_lead
                     });
-                } else if (current.team_lead != request.body.team_lead) {
-                    current.team_lead = request.body.team_lead
-                    await current.save();
                 }
+            } else if (!current) { // For employees without team
+                await Employment_History.create({
+                    employeeId: employee.id,
+                    teamId: request.body.team,
+                    since: new Date(),
+                    to: null,
+                    team_lead: request.body.team_lead
+                });
             }
 
+        } else if (request.body.is_client) {
+            const employee_projects = await Employee_Project.findAll({
+                where: { employee_id: employee.id }
+            })
+
+            const current = employee_projects.find(ep => ep.to === null)
+
+            if (!hasEditAnyUserPermission && (
+                updatedUser.name !== user.name ||
+                updatedUser.surname !== user.surname ||
+                updatedUser.email !== user.email ||
+                updatedUser.phone !== user.phone ||
+                updatedUser.accessId !== user.accessId ||
+                request.body.project !== current.projectId
+            )) {
+                return response.status(403).json({
+                    error: 'Forbidden'
+                })
+            }
+
+            if (current.projectId !== request.body.project) { // client will always be associated with project
+                current.to = new Date();
+                await current.save();
+
+                await Employee_Project.create({
+                    employeeId: employee.id,
+                    projectId: request.body.project,
+                    since: new Date(),
+                    to: null,
+                    roleId: 6
+                });
+            }
         }
+
+        user.name = updatedUser.name
+        user.surname = updatedUser.surname
+        user.email = updatedUser.email
+        user.passwordHash = updatedUser.passwordHash
+        user.phone = updatedUser.phone
+        user.accessId = updatedUser.accessId
+        user.disabled = updatedUser.disabled
+
+        await user.save();
 
         response.json(user)
 
