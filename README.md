@@ -17,7 +17,7 @@ Serwer aplikacji został utworzony przy użyciu frameworku **Express.js**, z wyk
 
 ### Technologie frontendowe
 
-Interfejs jest napisany w środowisku uruchomieniowym **Node.js**, przy użyciu frameworków **React** oraz **Vue**. Znaczna część komponentów wykorzystanych w aplikacji pochodzi z biblioteki **Material UI**.
+Interfejs jest napisany w środowisku uruchomieniowym **Node.js**, przy użyciu frameworku **React** oraz narzędzia do bundlingu **Vite**. Znaczna część komponentów wykorzystanych w aplikacji pochodzi z biblioteki **Material UI**.
 
 ### Hosting
 
