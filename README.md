@@ -38,9 +38,9 @@ Aby uruchomić aplikację lokalnie należy:
     - login: taskly.db.user@gmail.com
     - hasło: 42M*E>vL})Tn8Mu
 6. Dodać do folderu aplikacji pliku .env (należy upewnić się, że utworzony plik nie jest plikiem tekstowym, a plikiem ENV) o następującej strukturze:
-    DATABASE_URL=postgres://postgres:bH21HI50Xm9p3on@127.0.0.1:15432
-    SECRET=secret
-    PORT=3001
+    - DATABASE_URL=postgres://postgres:bH21HI50Xm9p3on@127.0.0.1:15432
+    - SECRET=secret
+    - PORT=3001
 7. W osobnych oknach konsoli, w folderze aplikacji, wywołać następujące komendy, w podanej kolejności:
     -   fly proxy 15432:5432 -a taskly-db
     -   npm install && npm run dev
