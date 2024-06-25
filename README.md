@@ -35,8 +35,8 @@ Aby uruchomić aplikację lokalnie należy:
     -	na Linux: curl -L https://fly.io/install.sh | sh
     -	na MacOS: curl -L https://fly.io/install.sh | sh
 5. Zalogować się na specjalnie utworzone konto w aplikacji fly.io przy uzyciu komendy 'fly auth login', podanymi danymi: 
-    login – taskly.db.user@gmail.com
-    hasło - 42M*E>vL})Tn8Mu
+    - login: taskly.db.user@gmail.com
+    - hasło: 42M*E>vL})Tn8Mu
 6. Dodać do folderu aplikacji pliku .env (należy upewnić się, że utworzony plik nie jest plikiem tekstowym, a plikiem ENV) o następującej strukturze:
     DATABASE_URL=postgres://postgres:bH21HI50Xm9p3on@127.0.0.1:15432
     SECRET=secret
@@ -47,20 +47,20 @@ Aby uruchomić aplikację lokalnie należy:
 8. Uruchomić aplikacę poprzez przejście na adres http://localhost:3001.
 9. Zalogować się do aplikacji na jednym z podanych kont (konta róznia się dostepnymi funkcjami):
     - Admin
-        Email: admin@gmail.com
-        Hasło: password
+        - Email: admin@gmail.com
+        - Hasło: password
     - Lider zespołu
-        Email: team_leader_1@gmail.com
-        Hasło: password
+        - Email: team_leader_1@gmail.com
+        - Hasło: password
     - Menadżer projektu
-        Email: manager1@gmail.com
-        Hasło: password
+        - Email: manager1@gmail.com
+        - Hasło: password
     - Pracownik
-        Email: pracownik1@gmail.com
-        Hasło: password
+        - Email: pracownik1@gmail.com
+        - Hasło: password
     - Klient
-        Email: klient1@gmail.com
-        Hasło: password
+        - Email: klient1@gmail.com
+        - Hasło: password
 
     
     
