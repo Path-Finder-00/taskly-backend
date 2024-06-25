@@ -1,9 +1,6 @@
 const router = require('express').Router()
-const { sequelize } = require('../util/db')
-const { Op } = require('sequelize')
 
-const { Ticket, Project, Employee, User, Priority, Status, Type, Ticket_History, Employee_Project, User_Ticket } = require('../models')
-const { tokenExtractor } = require('../util/middleware')
+const { Ticket_History } = require('../models')
 
 router.get('/:id', async (request, response) => {
     try {

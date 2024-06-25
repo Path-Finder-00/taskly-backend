@@ -5,7 +5,6 @@ const { tokenExtractor, checkPermissions } = require('../util/middleware')
 const { getPermissions } = require('../util/getPermissions')
 
 router.post('/', tokenExtractor, checkPermissions(['createUser']), async (request, response) => {
-    console.log(request.body)
     const { name, surname, email, password, phone, admin, technologies, team, project, team_lead, role, is_client, organization } = request.body
 
     if (password.length < 8) {
@@ -85,8 +84,7 @@ router.get('/:id', tokenExtractor, async (request, response) => {
             include: {
                 model: Employee,
                 include: {
-                    model: Technology,
-                    // attributes: ['technology']
+                    model: Technology
                 },
             },
             attributes: ['email', 'id', 'name', 'surname', 'phone', 'accessId']
