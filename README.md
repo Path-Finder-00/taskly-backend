@@ -17,7 +17,7 @@ Serwer aplikacji został utworzony przy użyciu frameworku **Express.js**, z wyk
 
 ### Technologie frontendowe
 
-Interfejs jest napisany w środowisku uruchomieniowym **Node.js**, przy użyciu frameworków **React** oraz **Vue**. Znaczna część komponentów wykorzystanych w aplikacji pochodzi z biblioteki **Material UI**.
+Interfejs jest napisany w środowisku uruchomieniowym **Node.js**, przy użyciu frameworku **React** oraz narzędzia do bundlingu **Vite**. Znaczna część komponentów wykorzystanych w aplikacji pochodzi z biblioteki **Material UI**.
 
 ### Hosting
 
@@ -30,7 +30,7 @@ Aby uruchomić aplikację lokalnie należy:
 1. Pobrać Node.js: [Pobierz Node.js](https://nodejs.org/en/download/prebuilt-installer)
 2. Sklonować to repozytorium przy uzyciu komendy 'git clone https://github.com/Path-Finder-00/taskly-backend.git'
 3. Zmienić gałąź na 'uat' przy pomocy komendy 'git switch uat && git pull'
-4. Zainstalować narzędzie konsolowe flyclt:
+4. Zainstalować narzędzie konsolowe flyctl, przy uzyciu terminala:
     -   na Windows: pwsh -Command "iwr https://fly.io/install.ps1 -useb | iex"
     -	na Linux: curl -L https://fly.io/install.sh | sh
     -	na MacOS: curl -L https://fly.io/install.sh | sh
