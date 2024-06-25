@@ -2,7 +2,7 @@ const router = require('express').Router()
 const { sequelize } = require('../util/db')
 const { Op } = require('sequelize')
 
-const { Ticket, User, Ticket_History, User_Ticket, Employee, Employment_History, Organization } = require('../models')
+const { Ticket, User, Ticket_History, User_Ticket, Employee, Employment_History } = require('../models')
 const { tokenExtractor, checkPermissions } = require('../util/middleware')
 const { getPermissions } = require('../util/getPermissions')
 

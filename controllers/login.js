@@ -30,13 +30,9 @@ router.post('/', async (request, response) => {
     const token = jwt.sign(
         userForToken,
         process.env.SECRET,
-        //{ expiresIn: 60*60 }
+        { expiresIn: 60*60 }
     )
     
-    // Because currently the token doesn't expire (look above), the token will only become 
-    // obsolete after being logged out (to be implemented) or after having one's rights access revoked
-    // (also to be implemented). Later however it will be necessary to delete the token from the db
-    // after it expires.
     await Session.create({ token: token, userId: user.id })
 
     response

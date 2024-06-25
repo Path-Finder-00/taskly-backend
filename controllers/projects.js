@@ -65,8 +65,6 @@ router.get('/projectsWithRoles', tokenExtractor, async (request, response) => {
         }
     })
 
-    console.log(user)
-
     const projectsWithRoles = user.employee?.employee_projects.map(project => ({ role: project.roleId, project: project.project }))
 
     response.json(projectsWithRoles)
@@ -194,7 +192,6 @@ router.get('/:id', async (request, response) => {
         response.status(500).send(error.message);
     }
 
-    // TODO: move to seperate endpoints
 });
 
 router.post('/', tokenExtractor, checkPermissions(['createProject']), async (request, response) => {
@@ -203,7 +200,6 @@ router.post('/', tokenExtractor, checkPermissions(['createProject']), async (req
         const project = await Project.create({ name: request.body.name, description: request.body.description })
 
         request.body.employees.forEach(async employee => {
-            console.log(employee)
             await Employee_Project.create({
                 since: new Date(),
                 employeeId: employee.id,
@@ -215,7 +211,6 @@ router.post('/', tokenExtractor, checkPermissions(['createProject']), async (req
         response.json(project);
 
     } catch (error) {
-        console.log(error)
         return response.status(400).json({ error })
     }
 })
@@ -236,9 +231,6 @@ router.put('/:projectId', tokenExtractor, async (request, response) => {
         const currentEmployees = await Employee_Project.findAll({
             where: { projectId: projectId }
         });
-
-        console.log("currentemployees")
-        console.log(currentEmployees)
 
         const incomingEmployeeIds = new Set(request.body.employees.map(emp => emp.id));
 
@@ -282,7 +274,6 @@ router.put('/:projectId', tokenExtractor, async (request, response) => {
         await project.save();
         response.json(project);
     } catch (error) {
-        console.log(error);
         response.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -328,7 +319,6 @@ router.get('/projectTickets/:id', async (request, response) => {
             response.json(tickets)
         })
     } catch (error) {
-        console.log(error)
         next(error)
     }
 });
